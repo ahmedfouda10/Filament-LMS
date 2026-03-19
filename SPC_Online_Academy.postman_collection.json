@@ -1,0 +1,2536 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "SPC Online Academy API",
+		"description": "Complete API collection for SPC Online Academy - a medical education platform. Base URL: http://spc.localhost/api/v1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://spc.localhost/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"description": "Authentication endpoints: register, login, logout, user info, token refresh, and password reset.",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Student\",\n    \"email\": \"test@example.com\",\n    \"phone\": \"+201234567890\",\n    \"password\": \"password\",\n    \"password_confirmation\": \"password\",\n    \"role\": \"student\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						},
+						"description": "Register a new student or instructor account. Returns user data and authentication token."
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Login (Student)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password\",\n    \"role\": \"student\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login as a student. Supports login by email or phone number. The test script auto-captures the token."
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Login (Instructor)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"ahmed@spc-academy.com\",\n    \"password\": \"password\",\n    \"role\": \"instructor\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login as an instructor (Dr. Ahmed Hassan). The test script auto-captures the token."
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Logout the currently authenticated user and revoke the current access token."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/user",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"user"
+							]
+						},
+						"description": "Get the currently authenticated user's profile data including instructor profile if applicable."
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						},
+						"description": "Refresh the authentication token. Revokes the current token and issues a new one."
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/forgot-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"forgot-password"
+							]
+						},
+						"description": "Send a password reset link to the user's email address."
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"reset-token-from-email\",\n    \"email\": \"test@example.com\",\n    \"password\": \"newpassword\",\n    \"password_confirmation\": \"newpassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/reset-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"reset-password"
+							]
+						},
+						"description": "Reset user password using a token received via email. Revokes all existing tokens."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Public",
+			"description": "Public endpoints accessible without authentication: courses, categories, instructors, subscription plans, and contact.",
+			"item": [
+				{
+					"name": "List Courses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/courses?per_page=9&category=&search=&level=&min_price=&max_price=&rating=&is_bundle=&sort_by=newest",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"courses"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "9",
+									"description": "Number of results per page (default: 9)"
+								},
+								{
+									"key": "category",
+									"value": "",
+									"description": "Filter by category slug"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by title or description"
+								},
+								{
+									"key": "level",
+									"value": "",
+									"description": "Filter by level: beginner, intermediate, advanced"
+								},
+								{
+									"key": "min_price",
+									"value": "",
+									"description": "Minimum price filter"
+								},
+								{
+									"key": "max_price",
+									"value": "",
+									"description": "Maximum price filter"
+								},
+								{
+									"key": "rating",
+									"value": "",
+									"description": "Minimum average rating filter"
+								},
+								{
+									"key": "is_bundle",
+									"value": "",
+									"description": "Filter by bundle status (true/false)"
+								},
+								{
+									"key": "sort_by",
+									"value": "newest",
+									"description": "Sort order: newest, popular, highest_rated, price_low, price_high"
+								}
+							]
+						},
+						"description": "List all published courses with filtering, searching, and sorting. Supports pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "Featured Courses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/courses/featured",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"courses",
+								"featured"
+							]
+						},
+						"description": "Get up to 8 featured published courses, ordered by newest first."
+					},
+					"response": []
+				},
+				{
+					"name": "Course Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/courses/introduction-to-clinical-pharmacy",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"courses",
+								"introduction-to-clinical-pharmacy"
+							]
+						},
+						"description": "Get detailed information about a specific course by slug, including modules, lessons, instructor, reviews, and enrollment count."
+					},
+					"response": []
+				},
+				{
+					"name": "Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories"
+							]
+						},
+						"description": "Get all categories with their course counts, ordered by sort_order."
+					},
+					"response": []
+				},
+				{
+					"name": "Instructor Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructors/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructors",
+								"2"
+							]
+						},
+						"description": "Get a specific instructor's public profile by user ID, including their published courses with ratings and enrollment counts."
+					},
+					"response": []
+				},
+				{
+					"name": "Subscription Plans",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/subscription-plans",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"subscription-plans"
+							]
+						},
+						"description": "Get all active subscription plans, ordered by duration in months."
+					},
+					"response": []
+				},
+				{
+					"name": "Contact",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John\",\n    \"email\": \"john@example.com\",\n    \"subject\": \"Inquiry\",\n    \"message\": \"Hello, I would like to know more about your medical courses and certification programs.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/contact",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"contact"
+							]
+						},
+						"description": "Submit a contact message. Fields: name (required), email (required), subject (optional), message (required)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Student",
+			"description": "Student-specific endpoints requiring authentication with a student role.",
+			"item": [
+				{
+					"name": "Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"dashboard"
+							]
+						},
+						"description": "Get student dashboard data: enrolled courses count, active subscriptions, completed courses, certificates earned, and continue learning list."
+					},
+					"response": []
+				},
+				{
+					"name": "My Courses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/courses?filter=all&search=&per_page=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"courses"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "all",
+									"description": "Filter by status: all, in-progress, completed"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by course title"
+								},
+								{
+									"key": "per_page",
+									"value": "10",
+									"description": "Number of results per page (default: 10)"
+								}
+							]
+						},
+						"description": "List all enrolled courses for the authenticated student with filtering by status and search by title. Supports pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "Course Player",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/courses/1/player",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"courses",
+								"1",
+								"player"
+							]
+						},
+						"description": "Get the course player data for a specific enrolled course. Returns course info, enrollment progress, modules with lessons, and lesson completion status."
+					},
+					"response": []
+				},
+				{
+					"name": "Complete Lesson",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/lessons/1/complete",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"lessons",
+								"1",
+								"complete"
+							]
+						},
+						"description": "Mark a lesson as completed. Recalculates enrollment progress and triggers certificate generation when all lessons and quizzes are done."
+					},
+					"response": []
+				},
+				{
+					"name": "Course Progress",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/courses/1/progress",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"courses",
+								"1",
+								"progress"
+							]
+						},
+						"description": "Get detailed progress for a specific enrolled course, including total lessons, completed count, and per-lesson completion data."
+					},
+					"response": []
+				},
+				{
+					"name": "Certificates",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/certificates",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"certificates"
+							]
+						},
+						"description": "List all certificates earned by the authenticated student, ordered by issue date descending."
+					},
+					"response": []
+				},
+				{
+					"name": "Download Certificate",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/certificates/1/download",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"certificates",
+								"1",
+								"download"
+							]
+						},
+						"description": "Get certificate download data including certificate number, student name, course title, instructor name, and PDF download URL."
+					},
+					"response": []
+				},
+				{
+					"name": "List Subscriptions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/subscriptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"subscriptions"
+							]
+						},
+						"description": "List all subscriptions for the authenticated student with plan details, ordered by creation date descending."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Subscription",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"plan_id\": 1,\n    \"auto_renew\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/subscriptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"subscriptions"
+							]
+						},
+						"description": "Create a new subscription for the authenticated student. Requires an active subscription plan ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Subscription",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"auto_renew\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/subscriptions/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"subscriptions",
+								"1"
+							]
+						},
+						"description": "Update subscription settings (auto_renew toggle) for a specific subscription."
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Subscription",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/subscriptions/1/cancel",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"subscriptions",
+								"1",
+								"cancel"
+							]
+						},
+						"description": "Cancel a specific subscription. Sets status to cancelled and disables auto-renew."
+					},
+					"response": []
+				},
+				{
+					"name": "List Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/orders?per_page=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"orders"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "10",
+									"description": "Number of results per page (default: 10)"
+								}
+							]
+						},
+						"description": "List all orders for the authenticated student with items and course details. Supports pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "Order Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/orders/ORD-ABC12345",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"orders",
+								"ORD-ABC12345"
+							]
+						},
+						"description": "Get detailed information about a specific order by order number."
+					},
+					"response": []
+				},
+				{
+					"name": "Order Receipt",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/orders/ORD-ABC12345/receipt",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"orders",
+								"ORD-ABC12345",
+								"receipt"
+							]
+						},
+						"description": "Get a printable receipt for a specific order including student info, line items, subtotal, discount, total, and payment method."
+					},
+					"response": []
+				},
+				{
+					"name": "List My Reviews",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/reviews",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"reviews"
+							]
+						},
+						"description": "List all reviews submitted by the authenticated student, including course details for each review."
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Review",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"course_id\": 1,\n    \"rating\": 5,\n    \"comment\": \"Excellent course with real clinical cases\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/reviews",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"reviews"
+							]
+						},
+						"description": "Submit a new review or update an existing review for a course. One review per course per student. Requires enrollment. Rating: 1-5, comment: optional (max 1000 chars)."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Review",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/reviews/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"reviews",
+								"1"
+							]
+						},
+						"description": "Delete a specific review owned by the authenticated student."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Instructor",
+			"description": "Instructor-specific endpoints requiring authentication with an instructor role.",
+			"item": [
+				{
+					"name": "Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"dashboard"
+							]
+						},
+						"description": "Get instructor dashboard metrics: total revenue, new students this month, average rating, active courses, revenue growth, and recent reviews."
+					},
+					"response": []
+				},
+				{
+					"name": "List Courses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/courses?per_page=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"courses"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "10",
+									"description": "Number of results per page (default: 10)"
+								}
+							]
+						},
+						"description": "List all courses belonging to the authenticated instructor with category, student count, and average rating. Supports pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Advanced Clinical Pharmacology\",\n    \"category_id\": 1,\n    \"short_description\": \"Master the principles of clinical pharmacology with real-world case studies and evidence-based approaches.\",\n    \"description\": \"This comprehensive course covers advanced clinical pharmacology concepts including pharmacokinetics, pharmacodynamics, drug interactions, therapeutic drug monitoring, and evidence-based prescribing. Ideal for pharmacy students, clinical pharmacists, and healthcare professionals seeking to deepen their understanding of drug therapy optimization.\",\n    \"price\": 299.99,\n    \"original_price\": 449.99,\n    \"level\": \"advanced\",\n    \"language\": \"English\",\n    \"is_bundle\": false,\n    \"requirements\": [\n        \"Basic knowledge of pharmacology\",\n        \"Understanding of human physiology\",\n        \"Familiarity with medical terminology\"\n    ],\n    \"learning_outcomes\": [\n        \"Apply pharmacokinetic principles to clinical scenarios\",\n        \"Identify and manage drug interactions\",\n        \"Perform therapeutic drug monitoring\",\n        \"Design evidence-based treatment plans\",\n        \"Evaluate drug safety and efficacy data\"\n    ],\n    \"tags\": [\n        \"pharmacology\",\n        \"clinical pharmacy\",\n        \"drug therapy\",\n        \"healthcare\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/courses",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"courses"
+							]
+						},
+						"description": "Create a new course. Requires: title, category_id, price. Optional: short_description, description, image, original_price, level, language, is_bundle, requirements, learning_outcomes, tags."
+					},
+					"response": []
+				},
+				{
+					"name": "Show Course",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/courses/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"courses",
+								"1"
+							]
+						},
+						"description": "Get detailed information about a specific instructor course by ID, including modules, lessons, category, reviews, and statistics."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Course",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Advanced Clinical Pharmacology - Updated\",\n    \"price\": 349.99,\n    \"level\": \"advanced\",\n    \"short_description\": \"Updated: Master advanced clinical pharmacology with real-world case studies.\",\n    \"tags\": [\n        \"pharmacology\",\n        \"clinical pharmacy\",\n        \"drug therapy\",\n        \"healthcare\",\n        \"updated\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/courses/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"courses",
+								"1"
+							]
+						},
+						"description": "Update an existing course. All fields are optional (partial update supported)."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Course",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/courses/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"courses",
+								"1"
+							]
+						},
+						"description": "Delete a specific course owned by the authenticated instructor."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Module",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"New Module\",\n    \"sort_order\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/courses/1/modules",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"courses",
+								"1",
+								"modules"
+							]
+						},
+						"description": "Create a new module within a course. Requires: title. Optional: sort_order."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Module",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Updated Module Title\",\n    \"sort_order\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/modules/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"modules",
+								"1"
+							]
+						},
+						"description": "Update an existing module. Verifies ownership through the module's course."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Module",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/modules/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"modules",
+								"1"
+							]
+						},
+						"description": "Delete a specific module owned by the authenticated instructor."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Lesson",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"New Lesson\",\n    \"type\": \"video\",\n    \"duration_minutes\": 30,\n    \"video_url\": \"https://www.youtube.com/watch?v=example123\",\n    \"content\": \"In this lesson, we cover the fundamentals of drug-receptor interactions and their clinical significance.\",\n    \"is_free\": false,\n    \"sort_order\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/modules/1/lessons",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"modules",
+								"1",
+								"lessons"
+							]
+						},
+						"description": "Create a new lesson within a module. Requires: title. Optional: type (video|quiz|assignment|reading), duration_minutes, video_url, content, is_free, sort_order."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Lesson",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Updated Lesson Title\",\n    \"type\": \"video\",\n    \"duration_minutes\": 45,\n    \"video_url\": \"https://www.youtube.com/watch?v=updated123\",\n    \"content\": \"Updated lesson content covering advanced pharmacodynamics.\",\n    \"is_free\": true,\n    \"sort_order\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/lessons/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"lessons",
+								"1"
+							]
+						},
+						"description": "Update an existing lesson. Verifies ownership through the lesson's module and course."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Lesson",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/lessons/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"lessons",
+								"1"
+							]
+						},
+						"description": "Delete a specific lesson owned by the authenticated instructor."
+					},
+					"response": []
+				},
+				{
+					"name": "Revenue",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/revenue",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"revenue"
+							]
+						},
+						"description": "Get instructor revenue summary: available balance, pending clearance, and lifetime earnings."
+					},
+					"response": []
+				},
+				{
+					"name": "Transactions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/transactions?filter=all&period=&per_page=15",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "all",
+									"description": "Filter by type: all, sales, payouts"
+								},
+								{
+									"key": "period",
+									"value": "",
+									"description": "Filter by period: current_month, last_month, year_to_date"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Number of results per page (default: 15)"
+								}
+							]
+						},
+						"description": "List all transactions for the authenticated instructor with filtering by type (sales/payouts) and time period. Supports pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "Payout Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 500.00,\n    \"payout_method\": \"bank_transfer\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/payout-request",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"payout-request"
+							]
+						},
+						"description": "Submit a payout request. Amount must not exceed the available balance. Requires: amount (min 1), payout_method."
+					},
+					"response": []
+				},
+				{
+					"name": "List Quizzes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/quizzes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"quizzes"
+							]
+						},
+						"description": "List all quizzes for courses owned by the authenticated instructor. Paginated, ordered by newest first. Includes course, lesson, and question count."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Quiz",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"course_id\": 1,\n    \"lesson_id\": 5,\n    \"title\": \"Module 1 Quiz\",\n    \"passing_score\": 70,\n    \"time_limit_minutes\": 15,\n    \"max_attempts\": 3,\n    \"questions\": [\n        {\n            \"question_text\": \"What is the first-line treatment for acute STEMI?\",\n            \"explanation\": \"Primary PCI with dual antiplatelet therapy is the standard of care for acute STEMI.\",\n            \"options\": [\n                { \"label\": \"A\", \"text\": \"Aspirin + Primary PCI\", \"is_correct\": true },\n                { \"label\": \"B\", \"text\": \"Beta-blockers alone\", \"is_correct\": false },\n                { \"label\": \"C\", \"text\": \"Calcium channel blockers\", \"is_correct\": false },\n                { \"label\": \"D\", \"text\": \"Watchful waiting\", \"is_correct\": false }\n            ]\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/quizzes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"quizzes"
+							]
+						},
+						"description": "Create a new quiz for a course, optionally with inline questions and options. Each question must have exactly 4 options (A,B,C,D) with exactly 1 correct answer."
+					},
+					"response": []
+				},
+				{
+					"name": "Show Quiz",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/quizzes/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"quizzes",
+								"1"
+							]
+						},
+						"description": "Get quiz details with all questions and options. Only accessible to the course owner."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Quiz",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Updated Quiz\",\n    \"passing_score\": 80\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/quizzes/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"quizzes",
+								"1"
+							]
+						},
+						"description": "Update quiz settings (title, passing_score, time_limit_minutes, max_attempts, lesson_id). Only the course owner can update."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Quiz",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/quizzes/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"quizzes",
+								"1"
+							]
+						},
+						"description": "Delete a quiz and all its questions and options. Only the course owner can delete."
+					},
+					"response": []
+				},
+				{
+					"name": "Add Question",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"question_text\": \"Which biomarker is most specific?\",\n    \"explanation\": \"Troponin I is the most cardiac-specific biomarker used in clinical practice.\",\n    \"sort_order\": 1,\n    \"options\": [\n        { \"label\": \"A\", \"text\": \"CK-MB\", \"is_correct\": false },\n        { \"label\": \"B\", \"text\": \"Troponin I\", \"is_correct\": true },\n        { \"label\": \"C\", \"text\": \"LDH\", \"is_correct\": false },\n        { \"label\": \"D\", \"text\": \"AST\", \"is_correct\": false }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/quizzes/1/questions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"quizzes",
+								"1",
+								"questions"
+							]
+						},
+						"description": "Add a question with 4 options to a quiz. Each question must have exactly 4 options (A,B,C,D) with exactly 1 correct answer."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Question",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"question_text\": \"Which cardiac biomarker is most specific for myocardial injury?\",\n    \"explanation\": \"Troponin I is highly specific to cardiac muscle tissue.\",\n    \"sort_order\": 1,\n    \"options\": [\n        { \"label\": \"A\", \"text\": \"CK-MB\", \"is_correct\": false },\n        { \"label\": \"B\", \"text\": \"Troponin I\", \"is_correct\": true },\n        { \"label\": \"C\", \"text\": \"LDH\", \"is_correct\": false },\n        { \"label\": \"D\", \"text\": \"AST\", \"is_correct\": false }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/questions/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"questions",
+								"1"
+							]
+						},
+						"description": "Update a question and optionally its options. If options are provided, all 4 are replaced. Only the course owner can update."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Question",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/questions/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"questions",
+								"1"
+							]
+						},
+						"description": "Delete a question and its options from a quiz. Only the course owner can delete."
+					},
+					"response": []
+				},
+				{
+					"name": "Reorder Modules",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order\": [3, 1, 2]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/courses/1/modules/reorder",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"courses",
+								"1",
+								"modules",
+								"reorder"
+							]
+						},
+						"description": "Reorder modules within a course. Provide an array of module IDs in the desired order. Only the course owner can reorder."
+					},
+					"response": []
+				},
+				{
+					"name": "Reorder Lessons",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order\": [5, 3, 4, 6]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/modules/1/lessons/reorder",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"modules",
+								"1",
+								"lessons",
+								"reorder"
+							]
+						},
+						"description": "Reorder lessons within a module. Provide an array of lesson IDs in the desired order. Only the course owner can reorder."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cart & Checkout",
+			"description": "Shopping cart and checkout endpoints for purchasing courses.",
+			"item": [
+				{
+					"name": "View Cart",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/cart",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cart"
+							]
+						},
+						"description": "Get the current user's cart with items, course details, instructor info, and applied promo code."
+					},
+					"response": []
+				},
+				{
+					"name": "Add Item",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"course_id\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/cart/items",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cart",
+								"items"
+							]
+						},
+						"description": "Add a published course to the cart. Validates the course exists, is published, and the user is not already enrolled or has it in cart."
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Item",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/cart/items/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cart",
+								"items",
+								"1"
+							]
+						},
+						"description": "Remove a specific item from the cart by cart item ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Cart",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/cart",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cart"
+							]
+						},
+						"description": "Remove all items from the cart and clear any applied promo code."
+					},
+					"response": []
+				},
+				{
+					"name": "Apply Promo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"SPC25\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/cart/promo",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cart",
+								"promo"
+							]
+						},
+						"description": "Apply a promo code to the cart. Validates code is active, not expired, within usage limits, and meets minimum purchase requirement."
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Promo",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/cart/promo",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cart",
+								"promo"
+							]
+						},
+						"description": "Remove the currently applied promo code from the cart."
+					},
+					"response": []
+				},
+				{
+					"name": "Checkout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payment_method\": \"credit_card\",\n    \"billing_street\": \"123 Medical Center Dr\",\n    \"billing_city\": \"Cairo\",\n    \"billing_state\": \"Cairo Governorate\",\n    \"billing_country\": \"Egypt\",\n    \"billing_postal_code\": \"11511\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/checkout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"checkout"
+							]
+						},
+						"description": "Process checkout for the current cart. Creates an order, enrolls the user in purchased courses, generates instructor transactions, and clears the cart. Payment methods: credit_card, mobile_wallet, bank_transfer, installment."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Quizzes",
+			"description": "Quiz endpoints for enrolled students to view and attempt quizzes.",
+			"item": [
+				{
+					"name": "Get Quiz",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/quizzes/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"quizzes",
+								"1"
+							]
+						},
+						"description": "Get quiz details with questions and answer options (without correct answer indicators). Requires student to be enrolled in the quiz's course."
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Attempt",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"answers\": {\n        \"1\": \"A\",\n        \"2\": \"B\",\n        \"3\": \"C\",\n        \"4\": \"A\",\n        \"5\": \"B\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/quizzes/1/attempt",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"quizzes",
+								"1",
+								"attempt"
+							]
+						},
+						"description": "Submit a quiz attempt with answers. Grades each answer, calculates score, determines pass/fail, and auto-marks the quiz lesson as completed if passed. Returns detailed results with correct answers and explanations."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Profile",
+			"description": "User profile management endpoints for authenticated users.",
+			"item": [
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Name\",\n    \"phone\": \"+201098765432\",\n    \"bio\": \"Experienced clinical pharmacist with 10 years in hospital practice.\",\n    \"specialization\": \"Clinical Pharmacology\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"profile"
+							]
+						},
+						"description": "Update user profile fields (name, phone). For instructors, also supports: bio, specialization, qualification, experience_years, website, linkedin, twitter."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Password",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"current_password\": \"password\",\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"password"
+							]
+						},
+						"description": "Update the authenticated user's password. Requires current password verification. New password must be at least 8 characters and confirmed."
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Avatar",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "",
+									"description": "Image file (jpeg, png, jpg, gif, webp). Max 2MB."
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/avatar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"avatar"
+							]
+						},
+						"description": "Upload a new avatar image. Accepts jpeg, png, jpg, gif, webp formats. Maximum file size: 2MB. Replaces any existing avatar."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Avatar",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/user/avatar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"avatar"
+							]
+						},
+						"description": "Remove the authenticated user's avatar image from storage and set avatar to null."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
