@@ -39,7 +39,7 @@ class CourseResource extends Resource
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->maxLength(255)
-                    ->live(onBlur: true)
+                    ->live()
                     ->afterStateUpdated(fn(Set $set, ?string $state) => $set('slug', Str::slug($state))),
                 Forms\Components\TextInput::make('slug')
                     ->required()
@@ -128,6 +128,14 @@ class CourseResource extends Resource
                     ->default(false),
                 Forms\Components\Toggle::make('is_featured')
                     ->default(false),
+                Forms\Components\TextInput::make('badge_text')
+                    ->label('Badge Text')
+                    ->placeholder('e.g. Most Popular, Hot Bundle')
+                    ->maxLength(50),
+                Forms\Components\Select::make('badge_color')
+                    ->label('Badge Color')
+                    ->options(['blue' => 'Blue', 'green' => 'Green', 'orange' => 'Orange', 'red' => 'Red', 'purple' => 'Purple'])
+                    ->placeholder('Select color'),
             ])->columns(2),
         ]);
     }

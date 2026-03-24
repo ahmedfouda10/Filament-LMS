@@ -25,7 +25,31 @@ class SubscriptionResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([]);
+        return $schema->columns(2)->schema([
+            Forms\Components\TextInput::make('student_name')
+                ->label('Student')
+                ->formatStateUsing(fn(Subscription $record): string => $record->user?->name ?? '-')
+                ->disabled(),
+            Forms\Components\TextInput::make('plan_name')
+                ->label('Plan')
+                ->formatStateUsing(fn(Subscription $record): string => $record->plan?->name ?? '-')
+                ->disabled(),
+            Forms\Components\TextInput::make('status')
+                ->label('Status')
+                ->disabled(),
+            Forms\Components\DatePicker::make('start_date')
+                ->label('Start Date')
+                ->disabled(),
+            Forms\Components\DatePicker::make('end_date')
+                ->label('End Date')
+                ->disabled(),
+            Forms\Components\Toggle::make('auto_renew')
+                ->label('Auto Renew')
+                ->disabled(),
+            Forms\Components\DateTimePicker::make('created_at')
+                ->label('Created At')
+                ->disabled(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -74,7 +98,8 @@ class SubscriptionResource extends Resource
                     ->preload(),
             ])
             ->recordActions([
-                ViewAction::make(),
+                ViewAction::make()
+                    ->modalWidth('3xl'),
                 Action::make('cancel')
                     ->label('Cancel')
                     ->icon('heroicon-o-x-circle')

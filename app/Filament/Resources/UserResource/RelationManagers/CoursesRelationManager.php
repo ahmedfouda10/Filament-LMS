@@ -40,7 +40,7 @@ class CoursesRelationManager extends RelationManager
             ->filters([])
             ->headerActions([])
             ->recordActions([
-                Tables\Actions\ViewAction::make()
+                \Filament\Actions\ViewAction::make()
                     ->url(fn($record) => route('filament.admin.resources.courses.edit', $record)),
             ])
             ->toolbarActions([]);

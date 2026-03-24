@@ -57,7 +57,7 @@ class ReviewsRelationManager extends RelationManager
             ])
             ->headerActions([])
             ->recordActions([
-                Tables\Actions\EditAction::make(),
+                \Filament\Actions\EditAction::make(),
             ])
             ->toolbarActions([]);
     }

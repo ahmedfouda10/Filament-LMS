@@ -14,6 +14,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             InstructorProfileSeeder::class,
             CourseSeeder::class,
+            CourseBundleItemSeeder::class,
+            LessonResourceSeeder::class,
             EnrollmentSeeder::class,
             ReviewSeeder::class,
             PromoCodeSeeder::class,
@@ -24,6 +26,15 @@ class DatabaseSeeder extends Seeder
             QuizAttemptSeeder::class,
             CertificateSeeder::class,
             ContactMessageSeeder::class,
+            WishlistSeeder::class,
+            NotificationSeeder::class,
+            CourseAnalyticSeeder::class,
+            VideoProgressSeeder::class,
+            PaymentLogSeeder::class,
+            UserPreferenceSeeder::class,
+            MessageSeeder::class,
+            CourseShareSeeder::class,
+            InstallmentPlanSeeder::class,
         ]);
     }
 }

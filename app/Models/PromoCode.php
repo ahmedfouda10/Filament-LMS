@@ -25,6 +25,9 @@ class PromoCode extends Model
         ];
     }
 
+    // Phase 2 relationships
+    public function usages() { return $this->hasMany(PromoCodeUsage::class); }
+
     public function isValid(): bool
     {
         if (!$this->is_active) return false;

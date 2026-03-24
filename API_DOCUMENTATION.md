@@ -12,6 +12,7 @@
 6. [Cart & Checkout](#6-cart--checkout)
 7. [Quiz Endpoints](#7-quiz-endpoints)
 8. [User Profile](#8-user-profile)
+9. [Additional Endpoints](#9-additional-endpoints)
 
 ---
 
@@ -667,6 +668,44 @@ Returns all active subscription plans ordered by `duration_months`.
 ```json
 {
   "message": "Your message has been sent successfully. We will get back to you soon."
+}
+```
+
+---
+
+### Site Settings
+`GET /api/v1/settings`
+
+**Auth:** Not Required
+
+Returns all public site settings including general info, appearance, social media links, SEO, and maintenance status. Sensitive settings (payment gateway keys, platform fee, certificate validity) are excluded.
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "site_name": "SPC Online Academy",
+    "logo": "/images/logo-spc.png",
+    "site_description": "Empowering Medical Professionals with high-quality clinical courses",
+    "contact_phone": "+20 100 123 4567",
+    "contact_email": "support@spc-academy.com",
+    "address": "Cairo, Egypt",
+    "working_hours": "Sun - Thu: 9:00 AM - 5:00 PM",
+    "primary_color": "#236bba",
+    "secondary_color": "#0f172a",
+    "facebook_url": "https://facebook.com/spc-academy",
+    "twitter_url": "https://twitter.com/spc_academy",
+    "instagram_url": "https://instagram.com/spc_academy",
+    "linkedin_url": "https://linkedin.com/company/spc-academy",
+    "youtube_url": "https://youtube.com/@spc-academy",
+    "meta_title": "SPC Online Academy - Medical Education Platform",
+    "meta_description": "Learn from expert doctors through clinical case studies, video courses, and interactive quizzes.",
+    "meta_keywords": "medical education, clinical cases, MBBS, online courses, Egypt",
+    "currency": "EGP",
+    "maintenance_mode": false,
+    "maintenance_message": "We are currently performing scheduled maintenance. Please check back soon."
+  }
 }
 ```
 
@@ -3066,24 +3105,2042 @@ Removes the user's avatar from storage and sets the avatar field to `null`.
 
 ---
 
+## 9. Additional Endpoints
+
+This section covers all additional endpoints beyond the core Phase 1 functionality, organized by category.
+
+---
+
+### 9.1 Public Endpoints
+
+#### Platform Stats
+`GET /api/v1/stats`
+
+**Auth:** Not Required
+
+Returns cached (1 hour) platform statistics.
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "active_students": 1250,
+    "total_courses": 85,
+    "total_instructors": 24,
+    "average_rating": 4.7
+  }
+}
+```
+
+---
+
+#### Testimonials
+`GET /api/v1/testimonials`
+
+**Auth:** Not Required
+
+Returns top approved reviews (rating >= 4) with user and course info.
+
+**Query Parameters:**
+
+| Param | Type    | Default | Description         |
+|-------|---------|---------|---------------------|
+| limit | integer | 8       | Number of results   |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "rating": 5,
+      "comment": "Excellent course!",
+      "user": {
+        "name": "Sara Ahmed",
+        "avatar": "/storage/avatars/sara.jpg",
+        "title": "Medical Student"
+      },
+      "course": {
+        "title": "Clinical Anatomy"
+      },
+      "created_at": "2026-03-01T12:00:00.000000Z"
+    }
+  ]
+}
+```
+
+---
+
+#### List Instructors
+`GET /api/v1/instructors`
+
+**Auth:** Not Required
+
+Returns all active instructors with aggregated stats.
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Dr. Ahmed Mohamed",
+      "avatar": "/storage/avatars/ahmed.jpg",
+      "specialization": "Cardiology",
+      "courses_count": 12,
+      "total_students": 450,
+      "average_rating": 4.8
+    }
+  ]
+}
+```
+
+---
+
+#### Get Bundle Details
+`GET /api/v1/bundles/{slug}`
+
+**Auth:** Not Required
+
+Returns bundle course details with included courses, reviews, and instructors.
+
+**URL Parameters:**
+
+| Param | Type   | Description  |
+|-------|--------|--------------|
+| slug  | string | Bundle slug  |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "id": 1,
+    "title": "Full-Stack Development Bundle",
+    "slug": "full-stack-development-bundle",
+    "short_description": "Everything you need to become a full-stack developer",
+    "image": "/storage/courses/bundle.jpg",
+    "price": 199.99,
+    "original_price": 399.99,
+    "level": "intermediate",
+    "language": "English",
+    "is_bundle": true,
+    "average_rating": "4.70",
+    "students_count": 85,
+    "total_duration": 4800,
+    "instructor": {
+      "id": 2,
+      "name": "Ahmed Instructor",
+      "avatar": "/storage/avatars/ahmed.jpg"
+    },
+    "category": {
+      "id": 1,
+      "name": "Web Development",
+      "slug": "web-development",
+      "icon": "code",
+      "description": "Build modern websites"
+    },
+    "courses": [
+      {
+        "id": 3,
+        "title": "React Fundamentals",
+        "slug": "react-fundamentals",
+        "image": "/storage/courses/react.jpg",
+        "price": 39.99,
+        "level": "beginner",
+        "average_rating": "4.50",
+        "students_count": 150,
+        "total_duration": 1200,
+        "lessons_count": 12
+      }
+    ],
+    "reviews_count": 24,
+    "reviews": [],
+    "instructors": []
+  }
+}
+```
+
+---
+
+#### Category Detail
+`GET /api/v1/categories/{slug}`
+
+**Auth:** Not Required
+
+Returns category details with courses count, total students, and courses list.
+
+**URL Parameters:**
+
+| Param | Type   | Description     |
+|-------|--------|-----------------|
+| slug  | string | Category slug   |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "id": 1,
+    "name": "Surgery",
+    "slug": "surgery",
+    "description": "Surgical courses and case studies.",
+    "image": "/storage/categories/surgery.jpg",
+    "courses_count": 15,
+    "total_students": 320,
+    "featured_videos_count": 8,
+    "courses": [
+      {
+        "id": 3,
+        "title": "General Surgery Basics",
+        "slug": "general-surgery-basics",
+        "image": "/storage/courses/surgery.jpg",
+        "price": 49.99,
+        "instructor_name": "Dr. Ahmed"
+      }
+    ]
+  }
+}
+```
+
+---
+
+#### Category Videos
+`GET /api/v1/categories/{slug}/videos`
+
+**Auth:** Not Required
+
+Returns paginated free video lessons within a category with search and sorting.
+
+**URL Parameters:**
+
+| Param | Type   | Description     |
+|-------|--------|-----------------|
+| slug  | string | Category slug   |
+
+**Query Parameters:**
+
+| Param    | Type    | Default      | Description                                  |
+|----------|---------|--------------|----------------------------------------------|
+| search   | string  | -            | Search by lesson title                       |
+| sort_by  | string  | most_viewed  | `most_viewed`, `newest`, or `duration`       |
+| per_page | integer | 8            | Items per page                               |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": 10,
+      "title": "Introduction to Suturing",
+      "video_url": "https://...",
+      "duration_minutes": 15,
+      "views_count": 1200,
+      "thumbnail": "/storage/thumbnails/suturing.jpg",
+      "course": {
+        "title": "General Surgery Basics"
+      }
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "per_page": 8,
+    "total": 24
+  }
+}
+```
+
+---
+
+#### FAQs
+`GET /api/v1/faqs`
+
+**Auth:** Not Required
+
+Returns FAQ questions grouped by category.
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "category": "General",
+      "questions": [
+        {
+          "id": 1,
+          "question": "How do I enroll in a course?",
+          "answer": "Browse our catalog and click Enroll to get started."
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+#### Legal Pages
+`GET /api/v1/pages/{slug}`
+
+**Auth:** Not Required
+
+Returns legal page content by slug (e.g., `terms`, `privacy`, `faq`).
+
+**URL Parameters:**
+
+| Param | Type   | Description                          |
+|-------|--------|--------------------------------------|
+| slug  | string | Page slug (e.g., terms, privacy)     |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "slug": "terms",
+    "title": "Terms of Service",
+    "content": "<h1>Terms of Service</h1><p>...</p>",
+    "updated_at": "2026-03-01T00:00:00.000000Z"
+  }
+}
+```
+
+**Error Response (404):**
+```json
+{
+  "message": "Page not found."
+}
+```
+
+---
+
+#### Feature Flags
+`GET /api/v1/features`
+
+**Auth:** Not Required
+
+Returns a map of all feature flags and their enabled/disabled status.
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "social_login": true,
+    "installments": false,
+    "offline_downloads": true,
+    "messaging": true,
+    "bundles": false
+  }
+}
+```
+
+---
+
+#### Track Course Share
+`POST /api/v1/courses/{course}/share`
+
+**Auth:** Not Required
+
+Records a share event for a course.
+
+**URL Parameters:**
+
+| Param  | Type    | Description |
+|--------|---------|-------------|
+| course | integer | Course ID   |
+
+**Request Body:**
+
+| Field    | Type   | Required | Description                                                         |
+|----------|--------|----------|---------------------------------------------------------------------|
+| platform | string | Yes      | `facebook`, `twitter`, `linkedin`, `whatsapp`, or `copy_link`       |
+
+**Response (200):**
+
+```json
+{
+  "message": "Share recorded."
+}
+```
+
+---
+
+#### Download by Token
+`GET /api/v1/downloads/{token}`
+
+**Auth:** Not Required (token-based)
+
+Downloads an offline course file using a previously generated token.
+
+**URL Parameters:**
+
+| Param | Type   | Description     |
+|-------|--------|-----------------|
+| token | string | Download token  |
+
+**Response (200):** Binary file download.
+
+**Error Response (410):**
+```json
+{
+  "message": "Download token has expired."
+}
+```
+
+---
+
+#### Social Login - Redirect
+`GET /api/v1/auth/social/{provider}/redirect`
+
+**Auth:** Not Required
+
+Redirects the user to the OAuth provider's authorization page.
+
+**URL Parameters:**
+
+| Param    | Type   | Description                  |
+|----------|--------|------------------------------|
+| provider | string | `google` or `facebook`       |
+
+**Response (302):** Redirect to OAuth provider.
+
+**Error Response (422):**
+```json
+{
+  "message": "Unsupported social provider."
+}
+```
+
+---
+
+#### Social Login - Callback
+`GET /api/v1/auth/social/{provider}/callback`
+
+**Auth:** Not Required
+
+Handles the OAuth callback from the provider after user authorization. Creates or links user account and returns an auth token.
+
+**URL Parameters:**
+
+| Param    | Type   | Description                  |
+|----------|--------|------------------------------|
+| provider | string | `google` or `facebook`       |
+
+**Response (200):**
+
+```json
+{
+  "message": "Login successful.",
+  "token": "1|abc123...",
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "student"
+  }
+}
+```
+
+---
+
+#### Social Login - Token Exchange
+`POST /api/v1/auth/social/{provider}/token`
+
+**Auth:** Not Required
+
+Token-based social authentication for SPA and mobile clients.
+
+**URL Parameters:**
+
+| Param    | Type   | Description                  |
+|----------|--------|------------------------------|
+| provider | string | `google` or `facebook`       |
+
+**Request Body:**
+
+| Field        | Type   | Required | Description                     |
+|--------------|--------|----------|---------------------------------|
+| access_token | string | Yes      | OAuth access token from provider|
+
+**Response (200):**
+
+```json
+{
+  "message": "Login successful.",
+  "token": "1|abc123...",
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "student"
+  }
+}
+```
+
+**Error Response (401):**
+```json
+{
+  "message": "Unable to authenticate with provider."
+}
+```
+
+---
+
+### 9.2 Student Endpoints
+
+#### List Wishlist
+`GET /api/v1/student/wishlist`
+
+**Auth:** Required
+**Role:** student
+
+Returns a paginated list of courses the student has wishlisted.
+
+**Query Parameters:**
+
+| Param    | Type    | Default | Description    |
+|----------|---------|---------|----------------|
+| per_page | integer | 10      | Items per page |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": 3,
+      "title": "React Fundamentals",
+      "slug": "react-fundamentals",
+      "image": "/storage/courses/react.jpg",
+      "price": 39.99,
+      "original_price": 59.99,
+      "level": "beginner",
+      "average_rating": "4.50",
+      "students_count": 150,
+      "instructor": {
+        "id": 2,
+        "name": "Ahmed Instructor",
+        "avatar": "/storage/avatars/ahmed.jpg"
+      },
+      "wishlisted_at": "2026-03-10T10:00:00.000000Z"
+    }
+  ],
+  "links": { "..." : "..." },
+  "meta": { "current_page": 1, "per_page": 10, "total": 5, "..." : "..." }
+}
+```
+
+---
+
+#### Add to Wishlist
+`POST /api/v1/student/wishlist/{course}`
+
+**Auth:** Required
+**Role:** student
+
+**URL Parameters:**
+
+| Param  | Type    | Description |
+|--------|---------|-------------|
+| course | integer | Course ID   |
+
+**Response (201):**
+
+```json
+{
+  "message": "Course added to wishlist."
+}
+```
+
+**Error Response (422):**
+
+```json
+{
+  "message": "Course is already in your wishlist."
+}
+```
+
+---
+
+#### Remove from Wishlist
+`DELETE /api/v1/student/wishlist/{course}`
+
+**Auth:** Required
+**Role:** student
+
+**URL Parameters:**
+
+| Param  | Type    | Description |
+|--------|---------|-------------|
+| course | integer | Course ID   |
+
+**Response (200):**
+
+```json
+{
+  "message": "Course removed from wishlist."
+}
+```
+
+---
+
+#### Update Video Progress
+`PUT /api/v1/student/lessons/{lesson}/video-progress`
+
+**Auth:** Required
+**Role:** student
+
+Saves the student's current video playback position for a lesson.
+
+**URL Parameters:**
+
+| Param  | Type    | Description |
+|--------|---------|-------------|
+| lesson | integer | Lesson ID   |
+
+**Request Body:**
+
+| Field              | Type    | Required | Description                            |
+|--------------------|---------|----------|----------------------------------------|
+| progress_seconds   | integer | Yes      | Current playback position in seconds   |
+| duration_seconds   | integer | Yes      | Total video duration in seconds        |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "lesson_id": 1,
+    "progress_seconds": 120,
+    "duration_seconds": 600,
+    "progress_percentage": 20.0
+  },
+  "message": "Video progress updated."
+}
+```
+
+---
+
+#### Get Video Progress
+`GET /api/v1/student/lessons/{lesson}/video-progress`
+
+**Auth:** Required
+**Role:** student
+
+**URL Parameters:**
+
+| Param  | Type    | Description |
+|--------|---------|-------------|
+| lesson | integer | Lesson ID   |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "lesson_id": 1,
+    "progress_seconds": 120,
+    "duration_seconds": 600,
+    "progress_percentage": 20.0
+  }
+}
+```
+
+---
+
+#### List Lesson Notes
+`GET /api/v1/student/lessons/{lesson}/notes`
+
+**Auth:** Required
+**Role:** student
+
+Returns all notes the student has created for a specific lesson.
+
+**URL Parameters:**
+
+| Param  | Type    | Description |
+|--------|---------|-------------|
+| lesson | integer | Lesson ID   |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "content": "Important: remember to review drug interactions",
+      "timestamp_seconds": 95,
+      "created_at": "2026-03-10T10:00:00.000000Z",
+      "updated_at": "2026-03-10T10:00:00.000000Z"
+    }
+  ]
+}
+```
+
+---
+
+#### Create Note
+`POST /api/v1/student/lessons/{lesson}/notes`
+
+**Auth:** Required
+**Role:** student
+
+**URL Parameters:**
+
+| Param  | Type    | Description |
+|--------|---------|-------------|
+| lesson | integer | Lesson ID   |
+
+**Request Body:**
+
+| Field             | Type    | Required | Description                         |
+|-------------------|---------|----------|-------------------------------------|
+| content           | string  | Yes      | Note content (max 5000)             |
+| timestamp_seconds | integer | No       | Video timestamp in seconds (min 0)  |
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "id": 2,
+    "content": "Key formula for calculating dosage",
+    "timestamp_seconds": 180,
+    "created_at": "2026-03-19T10:00:00.000000Z",
+    "updated_at": "2026-03-19T10:00:00.000000Z"
+  },
+  "message": "Note created successfully."
+}
+```
+
+---
+
+#### Update Note
+`PUT /api/v1/student/notes/{note}`
+
+**Auth:** Required
+**Role:** student
+
+**URL Parameters:**
+
+| Param | Type    | Description |
+|-------|---------|-------------|
+| note  | integer | Note ID     |
+
+**Request Body:**
+
+| Field             | Type    | Required | Description                         |
+|-------------------|---------|----------|-------------------------------------|
+| content           | string  | Yes      | Note content (max 5000)             |
+| timestamp_seconds | integer | No       | Video timestamp in seconds (min 0)  |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "id": 2,
+    "content": "Updated note content",
+    "timestamp_seconds": 180,
+    "created_at": "2026-03-19T10:00:00.000000Z",
+    "updated_at": "2026-03-19T11:00:00.000000Z"
+  },
+  "message": "Note updated successfully."
+}
+```
+
+---
+
+#### Delete Note
+`DELETE /api/v1/student/notes/{note}`
+
+**Auth:** Required
+**Role:** student
+
+**URL Parameters:**
+
+| Param | Type    | Description |
+|-------|---------|-------------|
+| note  | integer | Note ID     |
+
+**Response (200):**
+
+```json
+{
+  "message": "Note deleted successfully."
+}
+```
+
+---
+
+#### List Notifications
+`GET /api/v1/student/notifications`
+
+**Auth:** Required
+**Role:** student
+
+Returns a paginated list of the student's notifications.
+
+**Query Parameters:**
+
+| Param    | Type    | Default | Description    |
+|----------|---------|---------|----------------|
+| per_page | integer | 15      | Items per page |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "type": "course_completed",
+      "title": "Course Completed",
+      "message": "Congratulations! You have completed React Fundamentals.",
+      "data": {
+        "course_id": 3,
+        "course_title": "React Fundamentals"
+      },
+      "read_at": null,
+      "created_at": "2026-03-19T10:00:00.000000Z"
+    }
+  ],
+  "links": { "..." : "..." },
+  "meta": { "current_page": 1, "per_page": 15, "total": 10, "..." : "..." }
+}
+```
+
+---
+
+#### Get Unread Notification Count
+`GET /api/v1/student/notifications/unread-count`
+
+**Auth:** Required
+**Role:** student
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "unread_count": 5
+  }
+}
+```
+
+---
+
+#### Mark Notification as Read
+`PUT /api/v1/student/notifications/{notification}/read`
+
+**Auth:** Required
+**Role:** student
+
+**URL Parameters:**
+
+| Param        | Type   | Description            |
+|--------------|--------|------------------------|
+| notification | string | Notification ID (UUID) |
+
+**Response (200):**
+
+```json
+{
+  "message": "Notification marked as read."
+}
+```
+
+---
+
+#### Mark All Notifications as Read
+`PUT /api/v1/student/notifications/read-all`
+
+**Auth:** Required
+**Role:** student
+
+**Response (200):**
+
+```json
+{
+  "message": "All notifications marked as read."
+}
+```
+
+---
+
+#### Get Notification Preferences
+`GET /api/v1/student/notification-preferences`
+
+**Auth:** Required
+**Role:** student
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "email_notifications": true,
+    "push_notifications": true,
+    "course_updates": true,
+    "promotional": false,
+    "quiz_reminders": true,
+    "certificate_issued": true
+  }
+}
+```
+
+---
+
+#### Update Notification Preferences
+`PUT /api/v1/student/notification-preferences`
+
+**Auth:** Required
+**Role:** student
+
+**Request Body:**
+
+| Field               | Type    | Required | Description                        |
+|---------------------|---------|----------|------------------------------------|
+| email_notifications | boolean | No       | Receive email notifications        |
+| push_notifications  | boolean | No       | Receive push notifications         |
+| course_updates      | boolean | No       | Notifications for course updates   |
+| promotional         | boolean | No       | Promotional notifications          |
+| quiz_reminders      | boolean | No       | Quiz reminder notifications        |
+| certificate_issued  | boolean | No       | Certificate issuance notifications |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "email_notifications": true,
+    "push_notifications": false,
+    "course_updates": true,
+    "promotional": false,
+    "quiz_reminders": true,
+    "certificate_issued": true
+  },
+  "message": "Notification preferences updated."
+}
+```
+
+---
+
+#### List Devices
+`GET /api/v1/student/devices`
+
+**Auth:** Required
+**Role:** student
+
+Returns a list of devices (active sessions/tokens) for the authenticated student.
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Chrome on Windows",
+      "ip_address": "192.168.1.1",
+      "last_active_at": "2026-03-19T10:00:00.000000Z",
+      "is_current": true
+    },
+    {
+      "id": 2,
+      "name": "Safari on iPhone",
+      "ip_address": "10.0.0.5",
+      "last_active_at": "2026-03-18T14:00:00.000000Z",
+      "is_current": false
+    }
+  ]
+}
+```
+
+---
+
+#### Revoke Device
+`DELETE /api/v1/student/devices/{device}`
+
+**Auth:** Required
+**Role:** student
+
+Revokes a specific device session (deletes the token).
+
+**URL Parameters:**
+
+| Param  | Type    | Description     |
+|--------|---------|-----------------|
+| device | integer | Device/Token ID |
+
+**Response (200):**
+
+```json
+{
+  "message": "Device revoked successfully."
+}
+```
+
+**Error Response (403):**
+
+```json
+{
+  "message": "You cannot revoke your current device."
+}
+```
+
+---
+
+#### List Offline Downloads
+`GET /api/v1/student/downloads`
+
+**Auth:** Required
+**Role:** student
+
+Returns a paginated list of the student's offline downloads with expiry and status.
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "course_title": "Clinical Anatomy",
+      "token": "abc123...",
+      "download_url": "/api/v1/downloads/abc123...",
+      "expires_at": "2026-03-20T10:00:00.000000Z",
+      "status": "active"
+    }
+  ],
+  "meta": { "current_page": 1, "per_page": 15, "total": 3 }
+}
+```
+
+---
+
+#### Generate Download Token
+`POST /api/v1/student/courses/{course}/download-token`
+
+**Auth:** Required
+**Role:** student
+
+Generates a 24-hour download token. Max 5 active downloads.
+
+**URL Parameters:**
+
+| Param  | Type    | Description |
+|--------|---------|-------------|
+| course | integer | Course ID   |
+
+**Request Body:**
+
+| Field     | Type    | Required | Description                |
+|-----------|---------|----------|----------------------------|
+| lesson_id | integer | No       | Specific lesson to download|
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "token": "abc123...",
+    "download_url": "/api/v1/downloads/abc123...",
+    "expires_at": "2026-03-20T10:00:00.000000Z"
+  },
+  "message": "Download token generated."
+}
+```
+
+---
+
+#### Remove Download
+`DELETE /api/v1/student/downloads/{download}`
+
+**Auth:** Required
+**Role:** student
+
+**URL Parameters:**
+
+| Param    | Type    | Description  |
+|----------|---------|--------------|
+| download | integer | Download ID  |
+
+**Response (200):**
+
+```json
+{
+  "message": "Download removed."
+}
+```
+
+---
+
+#### Request Refund
+`POST /api/v1/student/orders/{order}/refund`
+
+**Auth:** Required
+**Role:** student
+
+Submits a refund request for a completed order.
+
+**URL Parameters:**
+
+| Param | Type    | Description |
+|-------|---------|-------------|
+| order | integer | Order ID    |
+
+**Request Body:**
+
+| Field  | Type   | Required | Description                   |
+|--------|--------|----------|-------------------------------|
+| reason | string | Yes      | Reason for refund (max 1000)  |
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "id": 1,
+    "order_number": "ORD-AB12CD34",
+    "status": "refund_requested",
+    "refund_reason": "Course content did not match description.",
+    "requested_at": "2026-03-19T10:00:00.000000Z"
+  },
+  "message": "Refund request submitted successfully."
+}
+```
+
+**Error Response (422):**
+
+```json
+{
+  "message": "A refund has already been requested for this order."
+}
+```
+
+---
+
+#### List Installment Plans
+`GET /api/v1/student/installments`
+
+**Auth:** Required
+**Role:** student
+
+Returns a paginated list of the student's installment plans with order details.
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "order_id": 5,
+      "total_amount": 300.00,
+      "paid_amount": 100.00,
+      "remaining_amount": 200.00,
+      "installments_count": 3,
+      "next_due_date": "2026-04-01"
+    }
+  ],
+  "meta": { "current_page": 1, "per_page": 15, "total": 2 }
+}
+```
+
+---
+
+#### Installment Plan Details
+`GET /api/v1/student/installments/{installment}`
+
+**Auth:** Required
+**Role:** student
+
+Returns full installment details including remaining months/amount.
+
+**URL Parameters:**
+
+| Param       | Type    | Description      |
+|-------------|---------|------------------|
+| installment | integer | Installment ID   |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "id": 1,
+    "order_id": 5,
+    "total_amount": 300.00,
+    "paid_amount": 100.00,
+    "remaining_amount": 200.00,
+    "installments_count": 3,
+    "next_due_date": "2026-04-01",
+    "payments": [
+      { "amount": 100.00, "paid_at": "2026-03-01T00:00:00.000000Z" }
+    ]
+  }
+}
+```
+
+---
+
+#### Download Subscription Invoice
+`GET /api/v1/student/subscriptions/{subscription}/invoice`
+
+**Auth:** Required
+**Role:** student
+
+Downloads subscription invoice as PDF.
+
+**URL Parameters:**
+
+| Param        | Type    | Description     |
+|--------------|---------|-----------------|
+| subscription | integer | Subscription ID |
+
+**Response (200):** Binary PDF with `Content-Type: application/pdf` and `Content-Disposition: attachment; filename="invoice-{id}.pdf"`.
+
+**Error Response (403):**
+```json
+{
+  "message": "This subscription does not belong to you."
+}
+```
+
+**Error Response (404):**
+```json
+{
+  "message": "Subscription not found."
+}
+```
+
+---
+
+#### Download Certificate PDF
+`GET /api/v1/student/certificates/{certificate}/pdf`
+
+**Auth:** Required
+**Role:** student
+
+Downloads the certificate as a PDF file.
+
+**URL Parameters:**
+
+| Param       | Type    | Description    |
+|-------------|---------|----------------|
+| certificate | integer | Certificate ID |
+
+**Response (200):** Binary PDF file download (`Content-Type: application/pdf`, `Content-Disposition: attachment`).
+
+**Error Response (403):**
+```json
+{
+  "message": "This certificate does not belong to you."
+}
+```
+
+---
+
+#### Preview Certificate PDF
+`GET /api/v1/student/certificates/{certificate}/preview`
+
+**Auth:** Required
+**Role:** student
+
+Renders the certificate PDF inline in the browser.
+
+**URL Parameters:**
+
+| Param       | Type    | Description    |
+|-------------|---------|----------------|
+| certificate | integer | Certificate ID |
+
+**Response (200):** Inline PDF (`Content-Type: application/pdf`, `Content-Disposition: inline`).
+
+**Error Response (403):**
+```json
+{
+  "message": "This certificate does not belong to you."
+}
+```
+
+---
+
+### 9.3 Instructor Endpoints
+
+#### Course Analytics
+`GET /api/v1/instructor/courses/{course}/analytics`
+
+**Auth:** Required
+**Role:** instructor
+
+Returns analytics data for a specific course owned by the instructor.
+
+**URL Parameters:**
+
+| Param  | Type    | Description |
+|--------|---------|-------------|
+| course | integer | Course ID   |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "course_id": 1,
+    "total_enrollments": 150,
+    "active_students": 120,
+    "completion_rate": 65.5,
+    "average_rating": 4.5,
+    "total_revenue": 5250.00,
+    "average_progress": 72.3,
+    "enrollments_over_time": [
+      { "date": "2026-03-01", "count": 5 },
+      { "date": "2026-03-02", "count": 3 }
+    ],
+    "revenue_over_time": [
+      { "date": "2026-03-01", "amount": 249.95 },
+      { "date": "2026-03-02", "amount": 149.97 }
+    ],
+    "lesson_completion_rates": [
+      { "lesson_id": 1, "title": "Introduction", "completion_rate": 95.0 },
+      { "lesson_id": 2, "title": "Setup", "completion_rate": 88.5 }
+    ]
+  }
+}
+```
+
+---
+
+#### Course Share Analytics
+`GET /api/v1/instructor/courses/{course}/shares`
+
+**Auth:** Required
+**Role:** instructor
+
+Returns total shares and breakdown by platform for a course.
+
+**URL Parameters:**
+
+| Param  | Type    | Description |
+|--------|---------|-------------|
+| course | integer | Course ID   |
+
+**Query Parameters:**
+
+| Param  | Type    | Default | Description          |
+|--------|---------|---------|----------------------|
+| period | integer | 30      | Days of data to show |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "total_shares": 45,
+    "by_platform": {
+      "facebook": 15,
+      "twitter": 10,
+      "whatsapp": 12,
+      "linkedin": 5,
+      "copy_link": 3
+    }
+  }
+}
+```
+
+---
+
+#### Upload Lesson Resource
+`POST /api/v1/instructor/lessons/{lesson}/resources`
+
+**Auth:** Required
+**Role:** instructor
+**Content-Type:** `multipart/form-data`
+
+Uploads a downloadable resource file for a lesson.
+
+**URL Parameters:**
+
+| Param  | Type    | Description |
+|--------|---------|-------------|
+| lesson | integer | Lesson ID   |
+
+**Request Body (form-data):**
+
+| Field       | Type   | Required | Description                            |
+|-------------|--------|----------|----------------------------------------|
+| file        | file   | Yes      | Resource file (pdf, doc, docx, ppt, pptx, xls, xlsx, zip). Max 10MB |
+| title       | string | Yes      | Resource title (max 255)               |
+| description | string | No       | Resource description (max 500)         |
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "id": 1,
+    "title": "Lecture Slides - Week 1",
+    "description": "PDF slides covering pharmacokinetics basics",
+    "file_url": "/storage/resources/lecture-slides-week1.pdf",
+    "file_size": 2048576,
+    "file_type": "pdf",
+    "created_at": "2026-03-19T10:00:00.000000Z"
+  },
+  "message": "Resource uploaded successfully."
+}
+```
+
+---
+
+#### Update Resource
+`PUT /api/v1/instructor/resources/{resource}`
+
+**Auth:** Required
+**Role:** instructor
+
+Updates resource metadata (title and description).
+
+**URL Parameters:**
+
+| Param    | Type    | Description |
+|----------|---------|-------------|
+| resource | integer | Resource ID |
+
+**Request Body:**
+
+| Field       | Type   | Required | Description                    |
+|-------------|--------|----------|--------------------------------|
+| title       | string | No       | Resource title (max 255)       |
+| description | string | No       | Resource description (max 500) |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "id": 1,
+    "title": "Updated Lecture Slides",
+    "description": "Updated description",
+    "file_url": "/storage/resources/lecture-slides-week1.pdf",
+    "file_size": 2048576,
+    "file_type": "pdf",
+    "created_at": "2026-03-19T10:00:00.000000Z"
+  },
+  "message": "Resource updated successfully."
+}
+```
+
+---
+
+#### Delete Resource
+`DELETE /api/v1/instructor/resources/{resource}`
+
+**Auth:** Required
+**Role:** instructor
+
+**URL Parameters:**
+
+| Param    | Type    | Description |
+|----------|---------|-------------|
+| resource | integer | Resource ID |
+
+**Response (200):**
+
+```json
+{
+  "message": "Resource deleted successfully."
+}
+```
+
+---
+
+#### Add Course to Bundle
+`POST /api/v1/instructor/courses/{course}/bundle-items`
+
+**Auth:** Required
+**Role:** instructor
+
+Adds an existing course as an item within a bundle course. The target course must be a bundle (`is_bundle = true`).
+
+**URL Parameters:**
+
+| Param  | Type    | Description          |
+|--------|---------|----------------------|
+| course | integer | Bundle course ID     |
+
+**Request Body:**
+
+| Field     | Type    | Required | Description                              |
+|-----------|---------|----------|------------------------------------------|
+| course_id | integer | Yes      | Course ID to add to the bundle           |
+| sort_order| integer | No       | Display order within the bundle (min 0)  |
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "id": 1,
+    "bundle_course_id": 5,
+    "course_id": 3,
+    "sort_order": 1,
+    "course": {
+      "id": 3,
+      "title": "React Fundamentals",
+      "slug": "react-fundamentals",
+      "image": "/storage/courses/react.jpg",
+      "price": 39.99
+    }
+  },
+  "message": "Course added to bundle."
+}
+```
+
+**Error Response (422):**
+
+```json
+{
+  "message": "This course is not a bundle."
+}
+```
+
+---
+
+#### Remove Course from Bundle
+`DELETE /api/v1/instructor/bundle-items/{bundleItem}`
+
+**Auth:** Required
+**Role:** instructor
+
+**URL Parameters:**
+
+| Param      | Type    | Description    |
+|------------|---------|----------------|
+| bundleItem | integer | Bundle item ID |
+
+**Response (200):**
+
+```json
+{
+  "message": "Course removed from bundle."
+}
+```
+
+---
+
+#### Reorder Bundle Items
+`PUT /api/v1/instructor/courses/{course}/bundle-items/reorder`
+
+**Auth:** Required
+**Role:** instructor
+
+Reorders the courses within a bundle.
+
+**URL Parameters:**
+
+| Param  | Type    | Description      |
+|--------|---------|------------------|
+| course | integer | Bundle course ID |
+
+**Request Body:**
+
+```json
+{
+  "order": [3, 1, 2]
+}
+```
+
+| Field | Type  | Required | Description                              |
+|-------|-------|----------|------------------------------------------|
+| order | array | Yes      | Array of bundle item IDs in the new order|
+
+**Response (200):**
+
+```json
+{
+  "message": "Bundle items reordered successfully."
+}
+```
+
+---
+
+#### Export Instructor Transactions
+`GET /api/v1/instructor/transactions/export`
+
+**Auth:** Required
+**Role:** instructor
+
+Downloads a CSV file of the instructor's transactions.
+
+**Response (200):** CSV file with `Content-Type: text/csv` and `Content-Disposition: attachment; filename="transactions-export.csv"`.
+
+---
+
+#### List Enrolled Students for a Course
+`GET /api/v1/instructor/courses/{id}/students`
+
+**Auth:** Required
+**Role:** instructor
+
+Returns paginated list of students enrolled in the instructor's course with progress.
+
+**URL Parameters:**
+
+| Param | Type    | Description |
+|-------|---------|-------------|
+| id    | integer | Course ID   |
+
+**Query Parameters:**
+
+| Param    | Type    | Default | Description     |
+|----------|---------|---------|-----------------|
+| per_page | integer | 15      | Items per page  |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "student": {
+        "id": 5,
+        "name": "Sara Ahmed",
+        "email": "sara@example.com",
+        "avatar": "/storage/avatars/sara.jpg"
+      },
+      "progress_percentage": 72.5,
+      "enrolled_at": "2026-02-10T08:00:00.000000Z",
+      "completed_at": null,
+      "last_activity_at": "2026-03-20T14:30:00.000000Z"
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "per_page": 15,
+    "total": 45
+  }
+}
+```
+
+---
+
+### 9.4 Authenticated User Endpoints
+
+#### Get User Preferences
+`GET /api/v1/user/preferences`
+
+**Auth:** Required
+
+Returns theme, language, and direction preferences. Auto-creates defaults on first access.
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "theme": "light",
+    "language": "en",
+    "direction": "ltr"
+  }
+}
+```
+
+---
+
+#### Update User Preferences
+`PUT /api/v1/user/preferences`
+
+**Auth:** Required
+
+Updates user preferences. Direction is auto-set from language.
+
+**Request Body:**
+
+| Field    | Type   | Required | Description                       |
+|----------|--------|----------|-----------------------------------|
+| theme    | string | No       | `light` or `dark`                 |
+| language | string | No       | Language code (e.g., `en`, `ar`)  |
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "theme": "dark",
+    "language": "en",
+    "direction": "ltr"
+  },
+  "message": "Preferences updated."
+}
+```
+
+---
+
+#### List Messages
+`GET /api/v1/messages`
+
+**Auth:** Required
+
+Returns paginated inbox or sent messages with sender/receiver/course info.
+
+**Query Parameters:**
+
+| Param  | Type   | Default | Description              |
+|--------|--------|---------|--------------------------|
+| filter | string | inbox   | `inbox` or `sent`        |
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "subject": "Question about lesson 3",
+      "body": "Could you explain...",
+      "sender": { "id": 5, "name": "Sara Ahmed" },
+      "receiver": { "id": 2, "name": "Dr. Ahmed" },
+      "course": { "id": 1, "title": "Clinical Anatomy" },
+      "read_at": null,
+      "created_at": "2026-03-19T10:00:00.000000Z"
+    }
+  ],
+  "meta": { "current_page": 1, "per_page": 15, "total": 8 }
+}
+```
+
+---
+
+#### Get Unread Message Count
+`GET /api/v1/messages/unread-count`
+
+**Auth:** Required
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "count": 3
+  }
+}
+```
+
+---
+
+#### List Conversations
+`GET /api/v1/messages/conversations`
+
+**Auth:** Required
+
+Returns conversations grouped by other user with last message and unread count.
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "user": { "id": 2, "name": "Dr. Ahmed", "avatar": "/storage/avatars/ahmed.jpg" },
+      "last_message": { "body": "Sure, let me explain...", "created_at": "2026-03-19T10:00:00.000000Z" },
+      "unread_count": 2
+    }
+  ]
+}
+```
+
+---
+
+#### Get Conversation Thread
+`GET /api/v1/messages/conversation/{user}`
+
+**Auth:** Required
+
+Returns full message thread with a specific user. Auto-marks received messages as read.
+
+**URL Parameters:**
+
+| Param | Type    | Description  |
+|-------|---------|--------------|
+| user  | integer | Other user ID|
+
+**Response (200):**
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "subject": "Question about lesson 3",
+      "body": "Could you explain...",
+      "sender": { "id": 5, "name": "Sara Ahmed" },
+      "read_at": "2026-03-19T11:00:00.000000Z",
+      "created_at": "2026-03-19T10:00:00.000000Z"
+    }
+  ]
+}
+```
+
+---
+
+#### Send Message
+`POST /api/v1/messages`
+
+**Auth:** Required
+
+Students can only message instructors of enrolled courses. Instructors can only message their students.
+
+**Request Body:**
+
+| Field       | Type    | Required | Description                   |
+|-------------|---------|----------|-------------------------------|
+| receiver_id | integer | Yes      | Recipient user ID             |
+| course_id   | integer | No       | Related course ID             |
+| subject     | string  | No       | Message subject               |
+| body        | string  | Yes      | Message body                  |
+
+**Response (201):**
+
+```json
+{
+  "data": {
+    "id": 2,
+    "subject": "Question",
+    "body": "How do I...",
+    "sender": { "id": 5, "name": "Sara Ahmed" },
+    "receiver": { "id": 2, "name": "Dr. Ahmed" },
+    "created_at": "2026-03-19T10:00:00.000000Z"
+  },
+  "message": "Message sent."
+}
+```
+
+---
+
+#### Mark Message as Read
+`PUT /api/v1/messages/{message}/read`
+
+**Auth:** Required
+
+Only the receiver can mark a message as read.
+
+**URL Parameters:**
+
+| Param   | Type    | Description |
+|---------|---------|-------------|
+| message | integer | Message ID  |
+
+**Response (200):**
+
+```json
+{
+  "message": "Message marked as read."
+}
+```
+
+---
+
+#### Subscribe to Category Notifications
+`POST /api/v1/categories/{slug}/subscribe`
+
+**Auth:** Required
+
+Subscribe to notifications for new courses in a category.
+
+**URL Parameters:**
+
+| Param | Type   | Description    |
+|-------|--------|----------------|
+| slug  | string | Category slug  |
+
+**Response (200):**
+
+```json
+{
+  "message": "Subscribed to category notifications."
+}
+```
+
+**Error Response (409):**
+```json
+{
+  "message": "Already subscribed to this category."
+}
+```
+
+---
+
+#### Unsubscribe from Category
+`DELETE /api/v1/categories/{slug}/unsubscribe`
+
+**Auth:** Required
+
+Unsubscribe from category notifications.
+
+**URL Parameters:**
+
+| Param | Type   | Description    |
+|-------|--------|----------------|
+| slug  | string | Category slug  |
+
+**Response (200):**
+
+```json
+{
+  "message": "Unsubscribed from category notifications."
+}
+```
+
+**Error Response (404):**
+```json
+{
+  "message": "Subscription not found."
+}
+```
+
+---
+
+#### Delete Account (GDPR)
+`DELETE /api/v1/user/account`
+
+**Auth:** Required
+
+Permanently deletes the authenticated user's account with GDPR-compliant data anonymization.
+
+**Request Body:**
+
+| Field    | Type   | Required | Description                    |
+|----------|--------|----------|--------------------------------|
+| password | string | Yes      | Current password for confirmation |
+| reason   | string | No       | Reason for account deletion    |
+
+**Response (200):**
+
+```json
+{
+  "message": "Account deleted successfully. Your data has been anonymized."
+}
+```
+
+**Error Response (403):**
+```json
+{
+  "message": "Incorrect password."
+}
+```
+
+---
+
+### 9.5 Webhook Endpoints
+
+#### Paymob Payment Webhook
+`POST /api/v1/payments/webhook`
+
+**Auth:** Not Required (verified by HMAC signature)
+
+Receives payment status updates from Paymob payment gateway.
+
+**Request Body:** Paymob webhook payload (JSON)
+
+**Response (200):**
+
+```json
+{
+  "message": "Webhook processed successfully."
+}
+```
+
+**Response (400):**
+
+```json
+{
+  "message": "Invalid webhook signature."
+}
+```
+
+> **Business Logic:**
+> - The webhook verifies the HMAC signature from the `hmac` query parameter.
+> - On successful payment: updates the order status to `completed`, sets `paid_at`, and creates enrollments.
+> - On failed payment: updates the order status to `failed`.
+
+---
+
+### 9.6 Modified Endpoints
+
+The following existing endpoints have been enhanced with additional fields and query parameters:
+
+#### GET /api/v1/courses
+- **New query parameter:** `price_type` -- filter by `free` or `paid`
+- **New response fields:** `lessons_count`, `bundled_courses_count` (for bundles), `badge_text`, `badge_color`
+
+#### GET /api/v1/courses/{slug}
+- **New response fields:** `preview_video_url` at the course level
+- **Modules** now include `lessons_count` and `total_duration_minutes`
+- **Lessons** now include `quiz.questions_count`, `views_count`, and `thumbnail`
+
+#### GET /api/v1/bundles/{slug}
+- **New response fields:** `reviews_count`, `reviews[]` array, `instructors[]` array
+- **Courses** in the bundle now include `lessons_count` and `total_duration`
+
+#### GET /api/v1/instructors/{id}
+- **New response fields:** full `courses[]` array and `reviews[]` array
+
+#### GET /api/v1/instructor/dashboard
+- **New response fields:** `students_growth` metric, `revenue_chart[]` with 30 days of daily revenue data
+
+#### GET /api/v1/instructor/courses
+- **New query parameters:** `status` (filter by `published` or `draft`), `search` (keyword search)
+- **New response field:** `revenue` per course
+
+#### GET /api/v1/instructor/courses/{id}
+- **New response fields:** `revenue`, `completion_rate`, `reviews_count`, `new_enrollments_this_month`
+
+#### GET /api/v1/student/dashboard
+- **New response fields:** `lessons_completed_this_week` stat, `instructor_avatar` in each `continue_learning` item
+
+---
+
 ## Appendix
 
 ### Role-Based Access Summary
 
-| Endpoint Prefix          | Required Role | Middleware              |
-|--------------------------|---------------|-------------------------|
-| `/api/v1/auth/*`         | None / Any    | Public or `auth:sanctum` |
-| `/api/v1/courses`        | None          | Public                  |
-| `/api/v1/categories`     | None          | Public                  |
-| `/api/v1/instructors/*`  | None          | Public                  |
-| `/api/v1/subscription-plans` | None      | Public                  |
-| `/api/v1/contact`        | None          | Public                  |
-| `/api/v1/cart/*`         | Any auth user | `auth:sanctum`          |
-| `/api/v1/checkout`       | Any auth user | `auth:sanctum`          |
-| `/api/v1/user/*`         | Any auth user | `auth:sanctum`          |
-| `/api/v1/student/*`      | student       | `auth:sanctum`, `role:student` |
-| `/api/v1/quizzes/*`      | student       | `auth:sanctum`, `role:student` |
-| `/api/v1/instructor/*`   | instructor    | `auth:sanctum`, `role:instructor` |
+| Endpoint Prefix              | Required Role | Middleware                        |
+|------------------------------|---------------|-----------------------------------|
+| `/api/v1/auth/*`             | None / Any    | Public or `auth:sanctum`          |
+| `/api/v1/courses`            | None          | Public                            |
+| `/api/v1/categories`         | None          | Public                            |
+| `/api/v1/categories/{slug}/subscribe` | Any auth user | `auth:sanctum`           |
+| `/api/v1/categories/{slug}/unsubscribe` | Any auth user | `auth:sanctum`         |
+| `/api/v1/bundles/*`          | None          | Public                            |
+| `/api/v1/instructors/*`      | None          | Public                            |
+| `/api/v1/subscription-plans` | None          | Public                            |
+| `/api/v1/contact`            | None          | Public                            |
+| `/api/v1/stats`              | None          | Public                            |
+| `/api/v1/testimonials`       | None          | Public                            |
+| `/api/v1/faqs`               | None          | Public                            |
+| `/api/v1/pages/*`            | None          | Public                            |
+| `/api/v1/features`           | None          | Public                            |
+| `/api/v1/downloads/{token}`  | None          | Public (token-based)              |
+| `/api/v1/settings`           | None          | Public                            |
+| `/api/v1/payments/webhook`   | None          | Public (signature verified)       |
+| `/api/v1/auth/social/*`      | None          | Public                            |
+| `/api/v1/cart/*`             | Any auth user | `auth:sanctum`                    |
+| `/api/v1/checkout`           | Any auth user | `auth:sanctum`                    |
+| `/api/v1/user/*`             | Any auth user | `auth:sanctum`                    |
+| `/api/v1/messages/*`         | Any auth user | `auth:sanctum`                    |
+| `/api/v1/student/*`          | student       | `auth:sanctum`, `role:student`    |
+| `/api/v1/quizzes/*`          | student       | `auth:sanctum`, `role:student`    |
+| `/api/v1/instructor/*`       | instructor    | `auth:sanctum`, `role:instructor` |
 
 ### Platform Fee Structure
 

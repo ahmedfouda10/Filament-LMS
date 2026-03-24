@@ -59,17 +59,6 @@ class SubscriptionPlanResource extends Resource
                     ->minValue(0)
                     ->maxValue(100),
             ])->columns(2),
-            Section::make('Features')->schema([
-                Forms\Components\Repeater::make('features')
-                    ->schema([
-                        Forms\Components\TextInput::make('feature')
-                            ->label('Feature')
-                            ->required(),
-                    ])
-                    ->columnSpanFull()
-                    ->defaultItems(1)
-                    ->addActionLabel('Add Feature'),
-            ]),
             Section::make('Status')->schema([
                 Forms\Components\Toggle::make('is_popular')
                     ->label('Popular Plan')
@@ -78,6 +67,16 @@ class SubscriptionPlanResource extends Resource
                     ->label('Active')
                     ->default(true),
             ])->columns(2),
+            Section::make('Features')->schema([
+                Forms\Components\Repeater::make('features')
+                    ->simple(
+                        Forms\Components\TextInput::make('feature')
+                            ->required(),
+                    )
+                    ->defaultItems(1)
+                    ->reorderable()
+                    ->addActionLabel('Add Feature'),
+            ])->collapsible(),
         ]);
     }
 

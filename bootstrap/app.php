@@ -19,40 +19,35 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // $exceptions->shouldRenderJsonWhen(function ($request) {
-        //     return $request->is('api/*') || $request->expectsJson();
-        // });
+        $exceptions->renderable(function (\Throwable $e, $request) {
+            if (!$request->is('api/*') && !$request->expectsJson()) {
+                return null;
+            }
 
-        // $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, $request) {
-        //     if ($request->is('api/*') || $request->expectsJson()) {
-        //         return response()->json([
-        //             'message' => $e->getMessage() ?: 'An error occurred.',
-        //         ], $e->getStatusCode());
-        //     }
-        // });
+            if ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
+                return response()->json(['message' => 'Resource not found.'], 404);
+            }
 
-        // $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, $request) {
-        //     if ($request->is('api/*') || $request->expectsJson()) {
-        //         return response()->json([
-        //             'message' => 'Unauthenticated.',
-        //         ], 401);
-        //     }
-        // });
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
+                $prev = $e->getPrevious();
+                if ($prev instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
+                    return response()->json(['message' => 'Resource not found.'], 404);
+                }
+                return response()->json(['message' => 'Not found.'], 404);
+            }
 
-        // $exceptions->render(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e, $request) {
-        //     if ($request->is('api/*') || $request->expectsJson()) {
-        //         return response()->json([
-        //             'message' => 'Resource not found.',
-        //         ], 404);
-        //     }
-        // });
+            if ($e instanceof \Illuminate\Auth\AuthenticationException) {
+                return response()->json(['message' => 'Unauthenticated.'], 401);
+            }
 
-        // $exceptions->render(function (\Illuminate\Validation\ValidationException $e, $request) {
-        //     if ($request->is('api/*') || $request->expectsJson()) {
-        //         return response()->json([
-        //             'message' => 'The given data was invalid.',
-        //             'errors' => $e->errors(),
-        //         ], 422);
-        //     }
-        // });
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                return response()->json(['message' => 'The given data was invalid.', 'errors' => $e->errors()], 422);
+            }
+
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+                return response()->json(['message' => $e->getMessage() ?: 'An error occurred.'], $e->getStatusCode());
+            }
+
+            return null;
+        });
     })->create();

@@ -346,6 +346,68 @@
 						"description": "Reset user password using a token received via email. Revokes all existing tokens."
 					},
 					"response": []
+				},
+				{
+					"name": "Subscribe to Category",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/categories/cardiology/subscribe",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								"cardiology",
+								"subscribe"
+							]
+						},
+						"description": "Subscribe to notifications for new courses in a category. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Unsubscribe from Category",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/categories/cardiology/unsubscribe",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								"cardiology",
+								"unsubscribe"
+							]
+						},
+						"description": "Unsubscribe from category notifications. Requires authentication."
+					},
+					"response": []
 				}
 			]
 		},
@@ -574,6 +636,263 @@
 							]
 						},
 						"description": "Submit a contact message. Fields: name (required), email (required), subject (optional), message (required)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Settings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/settings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"settings"
+							]
+						},
+						"description": "Returns all public site settings including general info, appearance, social media, SEO, and maintenance status."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Bundle Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bundles/full-stack-development-bundle",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bundles",
+								"full-stack-development-bundle"
+							]
+						},
+						"description": "Get bundle details with included courses by slug. Returns bundle info, pricing, and all courses in the bundle."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/stats",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"stats"
+							]
+						},
+						"description": "Returns cached platform statistics: active students, total courses, total instructors, average rating."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Testimonials",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/testimonials?limit=8",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"testimonials"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "8",
+									"description": "Number of testimonials (default 8)"
+								}
+							]
+						},
+						"description": "Returns top approved reviews (rating >= 4) with user name, avatar, title and course title."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/categories/cardiology",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								"cardiology"
+							]
+						},
+						"description": "Returns category details with courses count, total students, featured videos count, and courses list."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category Videos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/categories/cardiology/videos?sort_by=most_viewed&per_page=8",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								"cardiology",
+								"videos"
+							],
+							"query": [
+								{
+									"key": "sort_by",
+									"value": "most_viewed",
+									"description": "Sort by: most_viewed, newest, duration"
+								},
+								{
+									"key": "per_page",
+									"value": "8",
+									"description": "Items per page (default 8)"
+								}
+							]
+						},
+						"description": "Returns paginated free video lessons within a category with search and sorting."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Page (Terms)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pages/terms",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pages",
+								"terms"
+							]
+						},
+						"description": "Returns legal page content for Terms of Service."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Page (Privacy)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pages/privacy",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pages",
+								"privacy"
+							]
+						},
+						"description": "Returns legal page content for Privacy Policy."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Page (FAQ)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pages/faq",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pages",
+								"faq"
+							]
+						},
+						"description": "Returns FAQ page content with questions grouped by category."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Page (About)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pages/about",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pages",
+								"about"
+							]
+						},
+						"description": "Returns About page content (title, description, mission, vision, values)."
 					},
 					"response": []
 				}
@@ -1134,6 +1453,638 @@
 							]
 						},
 						"description": "Delete a specific review owned by the authenticated student."
+					},
+					"response": []
+				},
+				{
+					"name": "List Wishlist",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/wishlist?per_page=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"wishlist"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "10",
+									"description": "Number of results per page (default: 10)"
+								}
+							]
+						},
+						"description": "List all wishlisted courses for the authenticated student. Supports pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "Add to Wishlist",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/wishlist/3",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"wishlist",
+								"3"
+							]
+						},
+						"description": "Add a course to the student's wishlist by course ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Remove from Wishlist",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/wishlist/3",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"wishlist",
+								"3"
+							]
+						},
+						"description": "Remove a course from the student's wishlist by course ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Video Progress",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"progress_seconds\": 120,\n    \"duration_seconds\": 600\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/lessons/1/video-progress",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"lessons",
+								"1",
+								"video-progress"
+							]
+						},
+						"description": "Save the current video playback position for a lesson. Requires progress_seconds and duration_seconds."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Video Progress",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/lessons/1/video-progress",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"lessons",
+								"1",
+								"video-progress"
+							]
+						},
+						"description": "Get the student's saved video playback position for a lesson."
+					},
+					"response": []
+				},
+				{
+					"name": "List Lesson Notes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/lessons/1/notes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"lessons",
+								"1",
+								"notes"
+							]
+						},
+						"description": "List all notes the student has created for a specific lesson."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Note",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"Key formula for calculating dosage\",\n    \"timestamp_seconds\": 180\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/lessons/1/notes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"lessons",
+								"1",
+								"notes"
+							]
+						},
+						"description": "Create a new note for a lesson. Requires content (max 5000). Optional: timestamp_seconds for video position."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Note",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"Updated note content\",\n    \"timestamp_seconds\": 200\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/notes/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"notes",
+								"1"
+							]
+						},
+						"description": "Update an existing note. Only the note owner can update it."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Note",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/notes/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"notes",
+								"1"
+							]
+						},
+						"description": "Delete a note owned by the authenticated student."
+					},
+					"response": []
+				},
+				{
+					"name": "List Notifications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/notifications?per_page=15",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"notifications"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Number of results per page (default: 15)"
+								}
+							]
+						},
+						"description": "List all notifications for the authenticated student. Supports pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "Unread Notification Count",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/notifications/unread-count",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"notifications",
+								"unread-count"
+							]
+						},
+						"description": "Get the count of unread notifications for the authenticated student."
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Notification Read",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/notifications/a1b2c3d4-e5f6-7890-abcd-ef1234567890/read",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"notifications",
+								"a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+								"read"
+							]
+						},
+						"description": "Mark a single notification as read by notification UUID."
+					},
+					"response": []
+				},
+				{
+					"name": "Mark All Notifications Read",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/notifications/read-all",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"notifications",
+								"read-all"
+							]
+						},
+						"description": "Mark all unread notifications as read for the authenticated student."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Notification Preferences",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/notification-preferences",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"notification-preferences"
+							]
+						},
+						"description": "Get the student's notification preference settings (email, push, course updates, promotional, quiz reminders, certificate issued)."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Notification Preferences",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email_notifications\": true,\n    \"push_notifications\": false,\n    \"course_updates\": true,\n    \"promotional\": false,\n    \"quiz_reminders\": true,\n    \"certificate_issued\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/notification-preferences",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"notification-preferences"
+							]
+						},
+						"description": "Update the student's notification preference settings. All fields are optional booleans."
+					},
+					"response": []
+				},
+				{
+					"name": "List Devices",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/devices",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"devices"
+							]
+						},
+						"description": "List all active devices/sessions for the authenticated student, including device name, IP, last active time, and whether it's the current device."
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke Device",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/devices/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"devices",
+								"2"
+							]
+						},
+						"description": "Revoke a specific device session by token ID. Cannot revoke the current device."
+					},
+					"response": []
+				},
+				{
+					"name": "Request Refund",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reason\": \"Course content did not match description.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/orders/ORD-ABC12345/refund",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"orders",
+								"ORD-ABC12345",
+								"refund"
+							]
+						},
+						"description": "Submit a refund request for a completed order. Requires a reason (max 1000 characters). One refund request per order."
+					},
+					"response": []
+				},
+				{
+					"name": "Subscription Invoice PDF",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/subscriptions/1/invoice",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"subscriptions",
+								"1",
+								"invoice"
+							]
+						},
+						"description": "Downloads subscription invoice as PDF. Requires student role."
 					},
 					"response": []
 				}
@@ -2059,6 +3010,342 @@
 						"description": "Reorder lessons within a module. Provide an array of lesson IDs in the desired order. Only the course owner can reorder."
 					},
 					"response": []
+				},
+				{
+					"name": "Course Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/courses/1/analytics",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"courses",
+								"1",
+								"analytics"
+							]
+						},
+						"description": "Get detailed analytics for a specific course: enrollments, active students, completion rate, average rating, revenue, progress averages, and time-series data."
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Lesson Resource",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "",
+									"description": "Resource file (pdf, doc, docx, ppt, pptx, xls, xlsx, zip). Max 10MB."
+								},
+								{
+									"key": "title",
+									"value": "Lecture Slides - Week 1",
+									"type": "text",
+									"description": "Resource title (required, max 255)"
+								},
+								{
+									"key": "description",
+									"value": "PDF slides covering pharmacokinetics basics",
+									"type": "text",
+									"description": "Resource description (optional, max 500)"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/lessons/1/resources",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"lessons",
+								"1",
+								"resources"
+							]
+						},
+						"description": "Upload a downloadable resource file for a lesson. Accepts pdf, doc, docx, ppt, pptx, xls, xlsx, zip. Max 10MB."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Resource",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Updated Lecture Slides\",\n    \"description\": \"Updated description for the resource\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/resources/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"resources",
+								"1"
+							]
+						},
+						"description": "Update resource metadata (title and description). Only the resource owner can update."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Resource",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/resources/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"resources",
+								"1"
+							]
+						},
+						"description": "Delete a lesson resource and its file from storage. Only the resource owner can delete."
+					},
+					"response": []
+				},
+				{
+					"name": "Add Course to Bundle",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"course_id\": 3,\n    \"sort_order\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/courses/5/bundle-items",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"courses",
+								"5",
+								"bundle-items"
+							]
+						},
+						"description": "Add an existing course as an item within a bundle course. The target course must be a bundle (is_bundle = true). Requires course_id, optional sort_order."
+					},
+					"response": []
+				},
+				{
+					"name": "Remove from Bundle",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/bundle-items/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"bundle-items",
+								"1"
+							]
+						},
+						"description": "Remove a course from a bundle by bundle item ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Reorder Bundle Items",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order\": [3, 1, 2]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instructor/courses/5/bundle-items/reorder",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"courses",
+								"5",
+								"bundle-items",
+								"reorder"
+							]
+						},
+						"description": "Reorder courses within a bundle. Provide an array of bundle item IDs in the desired order."
+					},
+					"response": []
+				},
+				{
+					"name": "Export Transactions CSV",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/transactions/export",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"transactions",
+								"export"
+							]
+						},
+						"description": "Downloads all instructor transactions as a CSV file."
+					},
+					"response": []
+				},
+				{
+					"name": "List Enrolled Students",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/courses/1/students?per_page=15",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"courses",
+								"1",
+								"students"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Items per page (default 15)"
+								}
+							]
+						},
+						"description": "Returns paginated list of enrolled students with progress for a specific course."
+					},
+					"response": []
 				}
 			]
 		},
@@ -2527,6 +3814,1205 @@
 							]
 						},
 						"description": "Remove the authenticated user's avatar image from storage and set avatar to null."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Webhooks",
+			"description": "Payment webhook endpoints for processing external payment gateway callbacks.",
+			"item": [
+				{
+					"name": "Paymob Payment Webhook",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"obj\": {\n        \"id\": 12345,\n        \"pending\": false,\n        \"amount_cents\": 10000,\n        \"success\": true,\n        \"is_auth\": false,\n        \"is_capture\": false,\n        \"is_standalone_payment\": true,\n        \"is_voided\": false,\n        \"is_refunded\": false,\n        \"is_3d_secure\": true,\n        \"order\": {\n            \"id\": 67890,\n            \"merchant_order_id\": \"ORD-AB12CD34\"\n        },\n        \"source_data\": {\n            \"type\": \"card\",\n            \"sub_type\": \"MasterCard\"\n        }\n    },\n    \"type\": \"TRANSACTION\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/payments/webhook",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"payments",
+								"webhook"
+							]
+						},
+						"description": "Paymob payment webhook endpoint. Receives payment status updates verified by HMAC signature. On success: updates order to completed, creates enrollments. On failure: marks order as failed."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Phase 3 - Preferences & Messages",
+			"description": "User preferences, messaging, downloads, shares, installments.",
+			"item": [
+				{
+					"name": "Get User Preferences",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/user/preferences",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"preferences"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Preferences",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"theme\": \"dark\", \"language\": \"en\"}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/preferences",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"preferences"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Messages (Inbox)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/messages?filter=inbox",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"messages"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "inbox"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unread Message Count",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/messages/unread-count",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"messages",
+								"unread-count"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Conversations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/messages/conversations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"messages",
+								"conversations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Conversation Thread",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/messages/conversation/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"messages",
+								"conversation",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"receiver_id\": 2, \"course_id\": 1, \"subject\": \"Question about Module 3\", \"body\": \"Dr., I have a question about the case study...\"}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/messages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Message as Read",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/messages/1/read",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"messages",
+								"1",
+								"read"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Download Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"lesson_id\": 1}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/courses/1/download-token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"courses",
+								"1",
+								"download-token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Downloads",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/downloads",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"downloads"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Track Course Share",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"platform\": \"whatsapp\"}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/courses/1/share",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"courses",
+								"1",
+								"share"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Course Share Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/courses/1/shares?period=30",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"courses",
+								"1",
+								"shares"
+							],
+							"query": [
+								{
+									"key": "period",
+									"value": "30"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Installments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/installments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"installments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Installment Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/installments/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"installments",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Phase 4 - Social Login & Account",
+			"description": "Phase 4 endpoints: Social OAuth login, feature flags, account deletion (GDPR), and certificate PDF download/preview.",
+			"item": [
+				{
+					"name": "Social Login - Google Redirect",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/social/google/redirect",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"social",
+								"google",
+								"redirect"
+							]
+						},
+						"description": "Redirects to Google OAuth consent screen. Browser will follow the 302 redirect."
+					},
+					"response": []
+				},
+				{
+					"name": "Social Login - Facebook Redirect",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/social/facebook/redirect",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"social",
+								"facebook",
+								"redirect"
+							]
+						},
+						"description": "Redirects to Facebook OAuth consent screen. Browser will follow the 302 redirect."
+					},
+					"response": []
+				},
+				{
+					"name": "Social Login - Google Callback",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/social/google/callback?code=AUTH_CODE_HERE&state=STATE_HERE",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"social",
+								"google",
+								"callback"
+							],
+							"query": [
+								{
+									"key": "code",
+									"value": "AUTH_CODE_HERE"
+								},
+								{
+									"key": "state",
+									"value": "STATE_HERE"
+								}
+							]
+						},
+						"description": "Handles Google OAuth callback. Normally called by the provider redirect, not directly."
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Social Login - Facebook Callback",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/social/facebook/callback?code=AUTH_CODE_HERE&state=STATE_HERE",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"social",
+								"facebook",
+								"callback"
+							],
+							"query": [
+								{
+									"key": "code",
+									"value": "AUTH_CODE_HERE"
+								},
+								{
+									"key": "state",
+									"value": "STATE_HERE"
+								}
+							]
+						},
+						"description": "Handles Facebook OAuth callback. Normally called by the provider redirect, not directly."
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Social Login - Token Exchange (Google)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"access_token\": \"ya29.a0AfH6SM...\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/social/google/token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"social",
+								"google",
+								"token"
+							]
+						},
+						"description": "Exchange a Google access token for an API auth token. For SPA/mobile clients."
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Social Login - Token Exchange (Facebook)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"access_token\": \"EAAGm0PX4ZCps...\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/social/facebook/token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"social",
+								"facebook",
+								"token"
+							]
+						},
+						"description": "Exchange a Facebook access token for an API auth token. For SPA/mobile clients."
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Feature Flags",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/features",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"features"
+							]
+						},
+						"description": "Returns a boolean map of all feature flags."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Account (GDPR)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"password\",\n    \"reason\": \"No longer need the service\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/account",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"account"
+							]
+						},
+						"description": "Permanently deletes the authenticated user's account with GDPR-compliant data anonymization."
+					},
+					"response": []
+				},
+				{
+					"name": "Download Certificate PDF",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/certificates/1/pdf",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"certificates",
+								"1",
+								"pdf"
+							]
+						},
+						"description": "Downloads the certificate as a PDF file attachment."
+					},
+					"response": []
+				},
+				{
+					"name": "Preview Certificate PDF",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/certificates/1/preview",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"certificates",
+								"1",
+								"preview"
+							]
+						},
+						"description": "Renders the certificate PDF inline in the browser for preview."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Feature Plan - Public",
+			"description": "Feature Plan public endpoints: stats, testimonials, instructors, categories, FAQs, and legal pages.",
+			"item": [
+				{
+					"name": "Platform Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/stats",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"stats"
+							]
+						},
+						"description": "Returns cached platform statistics: active students, total courses, total instructors, average rating."
+					},
+					"response": []
+				},
+				{
+					"name": "Testimonials",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/testimonials?limit=8",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"testimonials"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "8",
+									"description": "Number of testimonials (default 8)"
+								}
+							]
+						},
+						"description": "Returns top approved reviews (rating >= 4) with user name, avatar, title and course title."
+					},
+					"response": []
+				},
+				{
+					"name": "List Instructors",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructors",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructors"
+							]
+						},
+						"description": "Returns all active instructors with specialization, courses_count, total_students, average_rating."
+					},
+					"response": []
+				},
+				{
+					"name": "Category Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/categories/surgery",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								"surgery"
+							]
+						},
+						"description": "Returns category detail with courses_count, total_students, featured_videos_count, and courses list."
+					},
+					"response": []
+				},
+				{
+					"name": "Category Videos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/categories/surgery/videos?search=&sort_by=most_viewed&per_page=8",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								"surgery",
+								"videos"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by lesson title"
+								},
+								{
+									"key": "sort_by",
+									"value": "most_viewed",
+									"description": "Sort: most_viewed, newest, or duration"
+								},
+								{
+									"key": "per_page",
+									"value": "8",
+									"description": "Items per page (default 8)"
+								}
+							]
+						},
+						"description": "Returns paginated free video lessons in a category with search and sorting."
+					},
+					"response": []
+				},
+				{
+					"name": "Legal Page (Terms)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pages/terms",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pages",
+								"terms"
+							]
+						},
+						"description": "Returns legal page content by slug. Use 'terms' or 'privacy'."
+					},
+					"response": []
+				},
+				{
+					"name": "Subscribe to Category",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/categories/surgery/subscribe",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								"surgery",
+								"subscribe"
+							]
+						},
+						"description": "Subscribe to notifications for a category. Requires authentication."
+					},
+					"response": []
+				},
+				{
+					"name": "Unsubscribe from Category",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/categories/surgery/unsubscribe",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								"surgery",
+								"unsubscribe"
+							]
+						},
+						"description": "Unsubscribe from category notifications. Requires authentication."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Feature Plan - Student",
+			"description": "Feature Plan student endpoints.",
+			"item": [
+				{
+					"name": "Download Subscription Invoice",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/student/subscriptions/1/invoice",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"subscriptions",
+								"1",
+								"invoice"
+							]
+						},
+						"description": "Downloads subscription invoice as PDF. Requires student role."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Feature Plan - Instructor",
+			"description": "Feature Plan instructor endpoints.",
+			"item": [
+				{
+					"name": "Export Transactions CSV",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/transactions/export",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"transactions",
+								"export"
+							]
+						},
+						"description": "Downloads all instructor transactions as a CSV file."
+					},
+					"response": []
+				},
+				{
+					"name": "List Course Students",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/instructor/courses/1/students?per_page=15",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instructor",
+								"courses",
+								"1",
+								"students"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Items per page (default 15)"
+								}
+							]
+						},
+						"description": "Returns paginated list of enrolled students with progress for a specific course."
 					},
 					"response": []
 				}

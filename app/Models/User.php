@@ -18,6 +18,7 @@ class User extends Authenticatable implements FilamentUser
 
     protected $fillable = [
         'name', 'email', 'password', 'phone', 'avatar', 'role', 'is_active',
+        'title', 'email_verification_token', 'max_devices',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -86,6 +87,25 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(Course::class, 'instructor_id');
     }
+
+    // Phase 2 relationships
+    public function devices() { return $this->hasMany(UserDevice::class); }
+    public function lessonNotes() { return $this->hasMany(LessonNote::class); }
+    public function wishlists() { return $this->hasMany(Wishlist::class); }
+    public function notifications() { return $this->hasMany(Notification::class); }
+    public function notificationPreference() { return $this->hasOne(UserNotificationPreference::class); }
+    public function videoProgress() { return $this->hasMany(VideoProgress::class); }
+    public function refundRequests() { return $this->hasMany(RefundRequest::class); }
+    public function promoCodeUsages() { return $this->hasMany(PromoCodeUsage::class); }
+
+    // Phase 3 relationships
+    public function preference() { return $this->hasOne(UserPreference::class); }
+    public function offlineDownloads() { return $this->hasMany(OfflineDownload::class); }
+    public function sentMessages() { return $this->hasMany(Message::class, 'sender_id'); }
+    public function receivedMessages() { return $this->hasMany(Message::class, 'receiver_id'); }
+    public function courseShares() { return $this->hasMany(CourseShare::class); }
+    public function installmentPlans() { return $this->hasMany(InstallmentPlan::class); }
+    public function socialAccounts() { return $this->hasMany(SocialAccount::class); }
 
     public function canAccessPanel(Panel $panel): bool
     {

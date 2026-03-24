@@ -41,4 +41,9 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    // Phase 2 relationships
+    public function paymentLogs() { return $this->hasMany(PaymentLog::class); }
+    public function refundRequest() { return $this->hasOne(RefundRequest::class); }
+    public function installmentPlan() { return $this->hasOne(InstallmentPlan::class); }
 }

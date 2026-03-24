@@ -17,7 +17,7 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
-        $user->update($request->only(['name', 'phone']));
+        $user->update($request->only(['name', 'phone', 'title']));
 
         // If instructor, update instructorProfile fields
         if ($user->role === 'instructor') {

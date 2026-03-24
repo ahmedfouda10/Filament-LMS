@@ -10,8 +10,8 @@ class Lesson extends Model
     use HasFactory;
 
     protected $fillable = [
-        'module_id', 'title', 'type', 'duration_minutes',
-        'video_url', 'content', 'is_free', 'sort_order',
+        'module_id', 'title', 'type', 'duration_minutes', 'video_duration_seconds',
+        'video_url', 'content', 'is_free', 'sort_order', 'views_count', 'thumbnail',
     ];
 
     protected function casts(): array
@@ -37,4 +37,9 @@ class Lesson extends Model
     {
         return $this->hasOne(Quiz::class);
     }
+
+    // Phase 2 relationships
+    public function resources() { return $this->hasMany(LessonResource::class); }
+    public function notes() { return $this->hasMany(LessonNote::class); }
+    public function videoProgress() { return $this->hasMany(VideoProgress::class); }
 }

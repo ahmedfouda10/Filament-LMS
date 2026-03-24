@@ -21,9 +21,13 @@ class CourseResource extends JsonResource
             'language' => $this->language,
             'is_bundle' => $this->is_bundle,
             'is_featured' => $this->is_featured,
+            'badge_text' => $this->badge_text,
+            'badge_color' => $this->badge_color,
             'average_rating' => $this->average_rating,
             'students_count' => $this->students_count,
             'total_duration' => $this->total_duration,
+            'lessons_count' => $this->whenCounted('lessons', $this->lessons_count ?? $this->getTotalLessonsCount()),
+            'bundled_courses_count' => $this->when($this->is_bundle, fn () => $this->bundleItems()->count()),
             'instructor' => new InstructorBriefResource($this->whenLoaded('instructor')),
             'category' => new CategoryResource($this->whenLoaded('category')),
         ];

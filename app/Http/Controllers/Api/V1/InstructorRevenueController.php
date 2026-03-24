@@ -96,6 +96,33 @@ class InstructorRevenueController extends Controller
         );
     }
 
+    public function exportCsv(Request $request)
+    {
+        $transactions = InstructorTransaction::where('instructor_id', $request->user()->id)
+            ->with('course:id,title')
+            ->orderByDesc('created_at')
+            ->get();
+
+        $csv = "Date,Transaction ID,Type,Course,Gross Amount,Platform Fee,Net Amount,Status\n";
+        foreach ($transactions as $t) {
+            $csv .= implode(',', [
+                $t->created_at->format('Y-m-d'),
+                $t->transaction_number,
+                $t->type,
+                '"' . ($t->course?->title ?? 'N/A') . '"',
+                $t->amount,
+                $t->platform_fee,
+                $t->net_amount,
+                $t->status,
+            ]) . "\n";
+        }
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="transactions-' . now()->format('Y-m-d') . '.csv"',
+        ]);
+    }
+
     public function requestPayout(PayoutRequest $request): JsonResponse
     {
         $userId = $request->user()->id;

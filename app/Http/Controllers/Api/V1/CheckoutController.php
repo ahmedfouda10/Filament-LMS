@@ -7,6 +7,7 @@ use App\Http\Requests\CheckoutRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Cart;
 use App\Models\Enrollment;
+use App\Models\InstallmentPlan;
 use App\Models\InstructorTransaction;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -110,6 +111,24 @@ class CheckoutController extends Controller
                         'transaction_number' => 'TXN-' . strtoupper(Str::random(5)),
                     ]);
                 }
+            }
+
+            // 11b. Create installment plan if payment_method is installment
+            if ($request->input('payment_method') === 'installment') {
+                $installmentMonths = (int) $request->input('installment_months', 6);
+                $installmentMonths = in_array($installmentMonths, [3, 6, 12]) ? $installmentMonths : 6;
+
+                InstallmentPlan::create([
+                    'order_id' => $order->id,
+                    'user_id' => $user->id,
+                    'provider' => $request->input('installment_provider', 'valu'),
+                    'total_amount' => $total,
+                    'monthly_amount' => round($total / $installmentMonths, 2),
+                    'months' => $installmentMonths,
+                    'paid_months' => 0,
+                    'status' => 'active',
+                    'next_payment_date' => now()->addMonth()->toDateString(),
+                ]);
             }
 
             // 12. Clear cart

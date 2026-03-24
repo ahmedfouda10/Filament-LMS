@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Enrollment;
+use App\Models\Review;
+use App\Observers\EnrollmentObserver;
+use App\Observers\ReviewObserver;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -22,6 +26,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Review::observe(ReviewObserver::class);
+        Enrollment::observe(EnrollmentObserver::class);
+
         RateLimiter::for('login', function (Request $request) {
             return Limit::perMinutes(15, 5)->by($request->ip());
         });

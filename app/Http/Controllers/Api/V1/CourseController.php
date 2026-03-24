@@ -56,6 +56,15 @@ class CourseController extends Controller
             $query->having('average_rating', '>=', $request->rating);
         }
 
+        // Filter by free/paid (#26)
+        if ($request->filled('price_type')) {
+            if ($request->price_type === 'free') {
+                $query->where('price', '<=', 0);
+            } elseif ($request->price_type === 'paid') {
+                $query->where('price', '>', 0);
+            }
+        }
+
         // Filter by bundle
         if ($request->filled('is_bundle')) {
             $query->where('is_bundle', $request->boolean('is_bundle'));
