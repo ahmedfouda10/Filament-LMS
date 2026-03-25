@@ -1,33 +1,17 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace App\Filament\Resources\Settings\Schemas;
 
-use App\Models\Setting;
 use Filament\Forms;
-use Filament\Notifications\Notification;
-use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
-class Settings extends Page
+class SettingForm
 {
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
-    protected static ?string $navigationLabel = 'Settings';
-    protected static ?int $navigationSort = 100;
-    protected string $view = 'filament.pages.settings';
-
-    public ?array $data = [];
-
-    public function mount(): void
-    {
-        $settings = Setting::pluck('value', 'key')->toArray();
-        $this->form->fill($settings);
-    }
-
-    public function form(Schema $schema): Schema
+    public static function configure(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 // General Settings
                 Section::make('General Settings')
                     ->icon('heroicon-o-cog-6-tooth')
@@ -218,26 +202,6 @@ class Settings extends Page
                             ->rows(2)
                             ->columnSpanFull(),
                     ])->columns(1),
-            ])
-            ->statePath('data');
-    }
-
-    public function save(): void
-    {
-        $data = $this->form->getState();
-
-        $toggleKeys = ['maintenance_mode', 'feature_social_login', 'feature_live_chat', 'feature_push_notifications', 'feature_offline_downloads', 'feature_messaging', 'installment_enabled', 'messaging_enabled', 'announcement_enabled'];
-
-        foreach ($data as $key => $value) {
-            if (in_array($key, $toggleKeys)) {
-                $value = $value ? 'true' : 'false';
-            }
-            Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-        }
-
-        Notification::make()
-            ->title('Settings saved successfully')
-            ->success()
-            ->send();
+            ]);
     }
 }
