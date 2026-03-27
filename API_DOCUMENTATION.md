@@ -2720,7 +2720,7 @@ Removes all items and the applied promo code from the cart.
 
 **Auth:** Required
 
-Processes the cart checkout. Creates an order, enrollments for each course, and instructor transactions. Then clears the cart.
+Processes the cart checkout. Creates a **pending** order and returns a Paymob payment URL. The student must complete payment on Paymob before the order is finalized.
 
 **Request Body:**
 
@@ -2738,42 +2738,11 @@ Processes the cart checkout. Creates an order, enrollments for each course, and 
 ```json
 {
   "data": {
-    "id": 5,
     "order_number": "ORD-AB12CD34",
-    "subtotal": 89.98,
-    "discount": 9.00,
-    "total": 80.98,
-    "payment_method": "credit_card",
-    "status": "completed",
-    "paid_at": "2026-03-19T10:00:00.000000Z",
-    "created_at": "2026-03-19T10:00:00.000000Z",
-    "items": [
-      {
-        "id": 1,
-        "course_id": 3,
-        "title": "React Fundamentals",
-        "instructor_name": "Ahmed Instructor",
-        "price": 39.99,
-        "original_price": null
-      },
-      {
-        "id": 2,
-        "course_id": 7,
-        "title": "Node.js Masterclass",
-        "instructor_name": "Ahmed Instructor",
-        "price": 49.99,
-        "original_price": null
-      }
-    ],
-    "billing": {
-      "street": "123 Main St",
-      "city": "Cairo",
-      "state": "Cairo",
-      "country": "Egypt",
-      "postal_code": "11511"
-    }
+    "payment_url": "https://accept.paymob.com/api/acceptance/iframes/963634?payment_token=...",
+    "status": "pending"
   },
-  "message": "Checkout completed successfully."
+  "message": "Proceed to payment."
 }
 ```
 
@@ -2791,12 +2760,44 @@ Processes the cart checkout. Creates an order, enrollments for each course, and 
 > 1. Validates the cart is not empty.
 > 2. Validates the user is not already enrolled in any of the cart's courses.
 > 3. Calculates subtotal from cart items.
-> 4. Applies promo code discount (percentage-based) if present, then increments the promo's `used_count`.
-> 5. Creates the `Order` record with status `completed` and `paid_at` set to now.
+> 4. Applies promo code discount (percentage-based) if present.
+> 5. Creates the `Order` record with status **`pending`** and `paid_at` = null.
 > 6. Creates `OrderItem` records with snapshot data (course title, instructor name, price).
-> 7. Creates `Enrollment` records for each course (progress starts at 0%).
-> 8. Creates `InstructorTransaction` records for each course: **20% platform fee**, net amount = 80% of sale price, status = `pending`.
+> 7. Calls Paymob API to register the order and get a payment URL.
+> 8. Saves `paymob_order_id` on the order.
 > 9. Clears the cart (items and promo code).
+> 10. Returns `payment_url` for the frontend to redirect the student to.
+>
+> **Note:** Enrollments and InstructorTransactions are **not** created at checkout. They are created when payment is confirmed via webhook or manual verification.
+
+### Payment Flow
+
+After checkout, the frontend should:
+
+1. **Open the `payment_url`** (iframe or redirect) — student enters card details and pays on Paymob.
+2. **Paymob sends a webhook** (`POST /payments/webhook`) to the backend — this confirms payment and creates enrollments.
+3. **Paymob redirects the student** (`GET /payments/callback`) — the backend redirects to the frontend success/failure page.
+4. **(Optional) Frontend calls verify** (`POST /payments/verify`) — as a fallback if the webhook hasn't arrived yet.
+
+```
+Frontend                    Backend                     Paymob
+   │                          │                           │
+   │── POST /checkout ──────>│── auth + register order ─>│
+   │<── { payment_url } ─────│<── payment token ─────────│
+   │                          │                           │
+   │── open payment_url ─────────────────────────────────>│
+   │   (student pays)         │                           │
+   │                          │<── POST /webhook ─────────│
+   │                          │  (order completed,        │
+   │                          │   enrollments created)    │
+   │<── redirect to callback ─────────────────────────────│
+   │── GET /callback ────────>│                           │
+   │<── 302 redirect ─────────│                           │
+   │   (success/failure page) │                           │
+   │                          │                           │
+   │── POST /verify (optional)>│                          │
+   │<── { status: completed } ─│                          │
+```
 
 ---
 
@@ -5041,37 +5042,130 @@ Permanently deletes the authenticated user's account with GDPR-compliant data an
 
 ---
 
-### 9.5 Webhook Endpoints
+### 9.5 Payment Endpoints
 
 #### Paymob Payment Webhook
 `POST /api/v1/payments/webhook`
 
 **Auth:** Not Required (verified by HMAC signature)
 
-Receives payment status updates from Paymob payment gateway.
+Receives payment status updates from Paymob payment gateway. This is called **server-to-server** by Paymob after a payment is processed.
 
-**Request Body:** Paymob webhook payload (JSON)
+**Request Body:** Paymob webhook payload (JSON) — contains `obj` with transaction details.
 
 **Response (200):**
 
 ```json
-{
-  "message": "Webhook processed successfully."
-}
+{ "status": "received" }
 ```
 
 **Response (400):**
 
 ```json
-{
-  "message": "Invalid webhook signature."
-}
+{ "status": "invalid_hmac" }
 ```
 
 > **Business Logic:**
-> - The webhook verifies the HMAC signature from the `hmac` query parameter.
-> - On successful payment: updates the order status to `completed`, sets `paid_at`, and creates enrollments.
+> - Verifies the HMAC signature from the request body using SHA-512.
+> - Logs the payment in `PaymentLog`.
+> - On successful payment (`obj.success = true`):
+>   1. Updates the order status to `completed` and sets `paid_at`.
+>   2. Creates `Enrollment` records for each course (with `firstOrCreate` to prevent duplicates).
+>   3. Creates `InstructorTransaction` records: **20% platform fee**, net amount = 80%.
+>   4. Increments promo code `used_count` if applicable.
 > - On failed payment: updates the order status to `failed`.
+
+---
+
+#### Payment Callback (Browser Redirect)
+`GET /api/v1/payments/callback`
+
+**Auth:** Not Required
+
+This is the URL Paymob redirects the student's browser to after payment. The backend verifies the payment and redirects to the frontend.
+
+**Query Parameters** (sent by Paymob):
+
+| Param              | Type    | Description                          |
+|--------------------|---------|--------------------------------------|
+| success            | string  | `"true"` or `"false"`                |
+| order              | string  | Paymob order ID                      |
+| merchant_order_id  | string  | Your order number (e.g. `ORD-xxx`)   |
+| amount_cents       | integer | Amount in cents                      |
+| hmac               | string  | HMAC signature for verification      |
+| id                 | integer | Paymob transaction ID                |
+
+**Response (302 Redirect):**
+
+- On success: redirects to `{frontend_url}/checkout/success?order_number=ORD-xxx`
+- On failure: redirects to `{frontend_url}/checkout/failed?order_number=ORD-xxx`
+
+> **Business Logic:**
+> - Verifies HMAC signature from query parameters.
+> - As a fallback, completes the order if the webhook hasn't arrived yet.
+> - Redirects the student to the frontend success or failure page.
+
+---
+
+#### Verify Payment (Manual)
+`POST /api/v1/payments/verify`
+
+**Auth:** Required
+
+Manually verifies a payment by querying Paymob API. Use this as a fallback when the webhook hasn't arrived (e.g., during local testing without ngrok).
+
+**Request Body:**
+
+| Field        | Type   | Required | Description                |
+|--------------|--------|----------|----------------------------|
+| order_number | string | Yes      | The order number to verify |
+
+**Response (200) — Payment confirmed:**
+
+```json
+{
+  "data": {
+    "order_number": "ORD-AB12CD34",
+    "status": "completed"
+  },
+  "message": "Payment verified and order completed."
+}
+```
+
+**Response (200) — Payment not yet received:**
+
+```json
+{
+  "data": {
+    "order_number": "ORD-AB12CD34",
+    "status": "pending"
+  },
+  "message": "Payment not yet confirmed by Paymob."
+}
+```
+
+**Response (200) — Already completed:**
+
+```json
+{
+  "data": {
+    "order_number": "ORD-AB12CD34",
+    "status": "completed"
+  },
+  "message": "Order is already completed."
+}
+```
+
+**Response (404):**
+
+```json
+{ "message": "Order not found." }
+```
+
+> **Business Logic:**
+> - Authenticates with Paymob API and queries the order's transactions.
+> - If Paymob confirms payment: completes the order (same logic as webhook).
+> - The student can only verify their own orders.
 
 ---
 
@@ -5132,7 +5226,9 @@ The following existing endpoints have been enhanced with additional fields and q
 | `/api/v1/features`           | None          | Public                            |
 | `/api/v1/downloads/{token}`  | None          | Public (token-based)              |
 | `/api/v1/settings`           | None          | Public                            |
-| `/api/v1/payments/webhook`   | None          | Public (signature verified)       |
+| `/api/v1/payments/webhook`   | None          | Public (HMAC signature verified)  |
+| `/api/v1/payments/callback`  | None          | Public (browser redirect)         |
+| `/api/v1/payments/verify`    | Any auth user | `auth:sanctum`                    |
 | `/api/v1/auth/social/*`      | None          | Public                            |
 | `/api/v1/cart/*`             | Any auth user | `auth:sanctum`                    |
 | `/api/v1/checkout`           | Any auth user | `auth:sanctum`                    |

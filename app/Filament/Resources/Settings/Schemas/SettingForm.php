@@ -37,6 +37,11 @@ class SettingForm
                             ->label('Address'),
                         Forms\Components\TextInput::make('working_hours')
                             ->label('Working Hours'),
+                        Forms\Components\TextInput::make('frontend_url')
+                            ->label('Frontend URL')
+                            ->url()
+                            ->placeholder('https://spc.a2za1.com')
+                            ->helperText('Used for payment callback redirects.'),
                     ])->columns(2),
 
                 // Announcements
@@ -127,20 +132,6 @@ class SettingForm
                             ->numeric()
                             ->minValue(1)
                             ->suffix('years'),
-                    ])->columns(3),
-
-                // Payment Gateway (Paymob)
-                Section::make('Payment Gateway (Paymob)')
-                    ->icon('heroicon-o-credit-card')
-                    ->schema([
-                        Forms\Components\TextInput::make('paymob_api_key')
-                            ->label('API Key')
-                            ->password()
-                            ->revealable(),
-                        Forms\Components\TextInput::make('paymob_integration_id')
-                            ->label('Integration ID'),
-                        Forms\Components\TextInput::make('paymob_iframe_id')
-                            ->label('iFrame ID'),
                     ])->columns(3),
 
                 // Social Login

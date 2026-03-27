@@ -84,7 +84,7 @@ class LessonProgressController extends Controller
                 ], [
                     'certificate_number' => 'CERT-' . strtoupper(Str::random(8)),
                     'issued_at' => now(),
-                    'expires_at' => now()->addYears(2),
+                    'valid_until' => now()->addYears(2),
                 ]);
 
                 // Mark enrollment as completed

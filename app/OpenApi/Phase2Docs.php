@@ -711,23 +711,108 @@ class Phase2Docs
     #[OA\Post(
         path: '/payments/webhook',
         summary: 'Paymob payment webhook',
-        description: 'Receives payment status updates from Paymob gateway. Verified by HMAC signature. On success: updates order to completed and creates enrollments. On failure: updates order to failed.',
+        description: 'Server-to-server webhook called by Paymob after payment processing. Verifies HMAC signature from the payload. On success: updates order to completed, creates Enrollments and InstructorTransactions, increments promo code usage. On failure: marks order as failed. Logs all payment attempts to payment_logs table.',
         tags: ['Webhooks'],
+        parameters: [
+            new OA\Parameter(name: 'hmac', in: 'query', required: false, description: 'HMAC signature for payload verification', schema: new OA\Schema(type: 'string')),
+        ],
         requestBody: new OA\RequestBody(
             required: true,
-            description: 'Paymob webhook payload',
+            description: 'Paymob webhook payload with transaction object',
             content: new OA\JsonContent(
                 properties: [
-                    new OA\Property(property: 'obj', type: 'object', description: 'Paymob transaction object'),
+                    new OA\Property(property: 'type', type: 'string', example: 'TRANSACTION'),
+                    new OA\Property(property: 'obj', type: 'object', description: 'Paymob transaction object', properties: [
+                        new OA\Property(property: 'id', type: 'integer', example: 12345),
+                        new OA\Property(property: 'pending', type: 'boolean', example: false),
+                        new OA\Property(property: 'amount_cents', type: 'integer', example: 262500),
+                        new OA\Property(property: 'success', type: 'boolean', example: true),
+                        new OA\Property(property: 'is_auth', type: 'boolean', example: false),
+                        new OA\Property(property: 'is_capture', type: 'boolean', example: false),
+                        new OA\Property(property: 'is_standalone_payment', type: 'boolean', example: true),
+                        new OA\Property(property: 'is_voided', type: 'boolean', example: false),
+                        new OA\Property(property: 'is_refunded', type: 'boolean', example: false),
+                        new OA\Property(property: 'is_3d_secure', type: 'boolean', example: true),
+                        new OA\Property(property: 'order', type: 'object', properties: [
+                            new OA\Property(property: 'id', type: 'integer', example: 67890),
+                            new OA\Property(property: 'merchant_order_id', type: 'string', example: 'ORD-AB12CD34'),
+                        ]),
+                        new OA\Property(property: 'source_data', type: 'object', properties: [
+                            new OA\Property(property: 'type', type: 'string', example: 'card'),
+                            new OA\Property(property: 'sub_type', type: 'string', example: 'MasterCard'),
+                        ]),
+                    ]),
                 ]
             )
         ),
         responses: [
-            new OA\Response(response: 200, description: 'Webhook processed', content: new OA\JsonContent(
-                properties: [new OA\Property(property: 'message', type: 'string', example: 'Webhook processed successfully.')]
+            new OA\Response(response: 200, description: 'Webhook received and processed', content: new OA\JsonContent(
+                properties: [new OA\Property(property: 'status', type: 'string', example: 'received')]
             )),
-            new OA\Response(response: 400, description: 'Invalid webhook signature'),
+            new OA\Response(response: 403, description: 'Invalid HMAC signature', content: new OA\JsonContent(
+                properties: [new OA\Property(property: 'status', type: 'string', example: 'invalid_hmac')]
+            )),
         ]
     )]
     public function paymobWebhook() {}
+
+    // ==================== PAYMENT CALLBACK ====================
+
+    #[OA\Get(
+        path: '/payments/callback',
+        summary: 'Paymob browser redirect callback',
+        description: 'Browser redirect endpoint after payment on Paymob. Receives payment result as query parameters, verifies HMAC, and redirects the user to the frontend success or failure page. Also completes the order as a fallback if the webhook has not arrived yet. No authentication required.',
+        tags: ['Payments'],
+        parameters: [
+            new OA\Parameter(name: 'success', in: 'query', required: false, description: 'Whether the payment was successful', schema: new OA\Schema(type: 'string', example: 'true')),
+            new OA\Parameter(name: 'order', in: 'query', required: false, description: 'Paymob order ID', schema: new OA\Schema(type: 'string', example: '67890')),
+            new OA\Parameter(name: 'merchant_order_id', in: 'query', required: false, description: 'Application order number', schema: new OA\Schema(type: 'string', example: 'ORD-AB12CD34')),
+            new OA\Parameter(name: 'amount_cents', in: 'query', required: false, description: 'Amount in cents', schema: new OA\Schema(type: 'integer', example: 262500)),
+            new OA\Parameter(name: 'hmac', in: 'query', required: false, description: 'HMAC signature for verification', schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'id', in: 'query', required: false, description: 'Paymob transaction ID', schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'currency', in: 'query', required: false, description: 'Currency code', schema: new OA\Schema(type: 'string', example: 'EGP')),
+            new OA\Parameter(name: 'source_data_type', in: 'query', required: false, description: 'Payment source type', schema: new OA\Schema(type: 'string', example: 'card')),
+            new OA\Parameter(name: 'source_data_sub_type', in: 'query', required: false, description: 'Payment source sub-type', schema: new OA\Schema(type: 'string', example: 'MasterCard')),
+        ],
+        responses: [
+            new OA\Response(response: 302, description: 'Redirects to frontend success page (/checkout/success?order_number=ORD-xxx) or failure page (/checkout/failed?order_number=ORD-xxx)'),
+        ]
+    )]
+    public function paymobCallback() {}
+
+    // ==================== PAYMENT VERIFICATION ====================
+
+    #[OA\Post(
+        path: '/payments/verify',
+        summary: 'Manually verify payment status',
+        description: 'Queries Paymob API to verify payment status for a pending order. Use this when the webhook/callback has not updated the order status yet. If payment is confirmed, completes the order (creates enrollments and instructor transactions). Only the order owner can verify their own orders.',
+        tags: ['Payments'],
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(
+            required: ['order_number'],
+            properties: [
+                new OA\Property(property: 'order_number', type: 'string', example: 'ORD-AB12CD34'),
+            ]
+        )),
+        responses: [
+            new OA\Response(response: 200, description: 'Payment verification result', content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'data', type: 'object', properties: [
+                        new OA\Property(property: 'order_number', type: 'string', example: 'ORD-AB12CD34'),
+                        new OA\Property(property: 'status', type: 'string', enum: ['completed', 'pending', 'failed'], example: 'completed'),
+                        new OA\Property(property: 'already_completed', type: 'boolean', example: false, description: 'Present when order was already completed before this request'),
+                        new OA\Property(property: 'paid_amount', type: 'number', example: 2625.00, description: 'Present when status is pending'),
+                        new OA\Property(property: 'expected_amount', type: 'number', example: 2625.00, description: 'Present when status is pending'),
+                    ]),
+                    new OA\Property(property: 'message', type: 'string', example: 'Payment verified and order completed.'),
+                ]
+            )),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 404, description: 'Order not found'),
+            new OA\Response(response: 422, description: 'No Paymob order ID found'),
+            new OA\Response(response: 500, description: 'Payment verification failed'),
+            new OA\Response(response: 502, description: 'Failed to inquire order from Paymob'),
+        ]
+    )]
+    public function paymentVerify() {}
 }

@@ -32,7 +32,7 @@ class CartController extends Controller
 
         // Check course exists and is published
         $course = Course::where('id', $request->course_id)
-            ->where('status', 'published')
+            ->where('is_published', true)
             ->firstOrFail();
 
         // Check user is not already enrolled in this course

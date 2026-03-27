@@ -284,6 +284,10 @@ Route::prefix('v1')->group(function () {
         });
     });
 
-    // Payment Webhook (no auth)
+    // Payment routes (no auth - called by Paymob)
     Route::post('/payments/webhook', [PaymentWebhookController::class, 'handle']);
+    Route::get('/payments/callback', [PaymentWebhookController::class, 'callback']);
+
+    // Payment verification (authenticated)
+    Route::middleware('auth:sanctum')->post('/payments/verify', [PaymentWebhookController::class, 'verify']);
 });

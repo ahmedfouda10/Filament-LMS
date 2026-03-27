@@ -14,6 +14,7 @@ class Order extends Model
         'order_number', 'user_id', 'promo_code_id', 'subtotal', 'discount',
         'total', 'payment_method', 'status', 'billing_street', 'billing_city',
         'billing_state', 'billing_country', 'billing_postal_code', 'paid_at',
+        'paymob_order_id',
     ];
 
     protected function casts(): array

@@ -56,6 +56,7 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: 'Instructor - Analytics', description: 'Course analytics')]
 #[OA\Tag(name: 'Instructor - Resources', description: 'Lesson resource management')]
 #[OA\Tag(name: 'Instructor - Bundles', description: 'Bundle course management')]
+#[OA\Tag(name: 'Payments', description: 'Payment callback and verification')]
 #[OA\Tag(name: 'Webhooks', description: 'Payment webhooks')]
 #[OA\Tag(name: 'Public - Settings', description: 'Site settings')]
 #[OA\Tag(name: 'User Preferences', description: 'Theme & language preferences')]

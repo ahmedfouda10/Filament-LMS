@@ -32,7 +32,7 @@ class StudentSubscriptionController extends Controller
 
         $subscription = Subscription::create([
             'user_id' => $request->user()->id,
-            'subscription_plan_id' => $plan->id,
+            'plan_id' => $plan->id,
             'start_date' => now(),
             'end_date' => now()->addMonths($plan->duration_months),
             'status' => 'active',

@@ -3582,7 +3582,7 @@
 								"checkout"
 							]
 						},
-						"description": "Process checkout for the current cart. Creates an order, enrolls the user in purchased courses, generates instructor transactions, and clears the cart. Payment methods: credit_card, mobile_wallet, bank_transfer, installment."
+						"description": "Process checkout for the current cart via Paymob payment gateway. Creates a pending order, initiates a Paymob payment session, clears the cart, and returns a payment_url. Redirect the user to the payment_url to complete payment. Enrollments and instructor transactions are created only after successful payment confirmation (via webhook or callback). Response: { data: { order_number, payment_url, status: 'pending' }, message }. Payment methods: credit_card, mobile_wallet, bank_transfer, installment."
 					},
 					"response": []
 				}
@@ -3820,8 +3820,8 @@
 			]
 		},
 		{
-			"name": "Webhooks",
-			"description": "Payment webhook endpoints for processing external payment gateway callbacks.",
+			"name": "Payments & Webhooks",
+			"description": "Payment webhook, browser callback, and manual verification endpoints for Paymob payment integration.",
 			"item": [
 				{
 					"name": "Paymob Payment Webhook",
@@ -3839,7 +3839,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"obj\": {\n        \"id\": 12345,\n        \"pending\": false,\n        \"amount_cents\": 10000,\n        \"success\": true,\n        \"is_auth\": false,\n        \"is_capture\": false,\n        \"is_standalone_payment\": true,\n        \"is_voided\": false,\n        \"is_refunded\": false,\n        \"is_3d_secure\": true,\n        \"order\": {\n            \"id\": 67890,\n            \"merchant_order_id\": \"ORD-AB12CD34\"\n        },\n        \"source_data\": {\n            \"type\": \"card\",\n            \"sub_type\": \"MasterCard\"\n        }\n    },\n    \"type\": \"TRANSACTION\"\n}",
+							"raw": "{\n    \"obj\": {\n        \"id\": 12345,\n        \"pending\": false,\n        \"amount_cents\": 262500,\n        \"success\": true,\n        \"is_auth\": false,\n        \"is_capture\": false,\n        \"is_standalone_payment\": true,\n        \"is_voided\": false,\n        \"is_refunded\": false,\n        \"is_3d_secure\": true,\n        \"currency\": \"EGP\",\n        \"created_at\": \"2026-03-27T10:00:00.000000\",\n        \"error_occured\": false,\n        \"has_parent_transaction\": false,\n        \"integration_id\": 123456,\n        \"owner\": 789,\n        \"order\": {\n            \"id\": 67890,\n            \"merchant_order_id\": \"ORD-AB12CD34\"\n        },\n        \"source_data\": {\n            \"type\": \"card\",\n            \"pan\": \"2346\",\n            \"sub_type\": \"MasterCard\"\n        }\n    },\n    \"type\": \"TRANSACTION\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3847,16 +3847,135 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/payments/webhook",
+							"raw": "{{baseUrl}}/payments/webhook?hmac=abc123hmacvalue",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"payments",
 								"webhook"
+							],
+							"query": [
+								{
+									"key": "hmac",
+									"value": "abc123hmacvalue",
+									"description": "HMAC signature for payload verification"
+								}
 							]
 						},
-						"description": "Paymob payment webhook endpoint. Receives payment status updates verified by HMAC signature. On success: updates order to completed, creates enrollments. On failure: marks order as failed."
+						"description": "Paymob server-to-server webhook. Receives payment status updates and verifies HMAC signature. On success: updates order to completed, creates Enrollments and InstructorTransactions, increments promo code usage. On failure: marks order as failed. All payments are logged to payment_logs table. No authentication required - called directly by Paymob."
+					},
+					"response": []
+				},
+				{
+					"name": "Paymob Payment Callback (Browser Redirect)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/payments/callback?success=true&order=67890&merchant_order_id=ORD-AB12CD34&amount_cents=262500&currency=EGP&id=12345&source_data_type=card&source_data_sub_type=MasterCard&hmac=abc123hmacvalue",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"payments",
+								"callback"
+							],
+							"query": [
+								{
+									"key": "success",
+									"value": "true",
+									"description": "Whether payment succeeded"
+								},
+								{
+									"key": "order",
+									"value": "67890",
+									"description": "Paymob order ID"
+								},
+								{
+									"key": "merchant_order_id",
+									"value": "ORD-AB12CD34",
+									"description": "Application order number"
+								},
+								{
+									"key": "amount_cents",
+									"value": "262500",
+									"description": "Amount in cents"
+								},
+								{
+									"key": "currency",
+									"value": "EGP",
+									"description": "Currency code"
+								},
+								{
+									"key": "id",
+									"value": "12345",
+									"description": "Paymob transaction ID"
+								},
+								{
+									"key": "source_data_type",
+									"value": "card",
+									"description": "Payment source type"
+								},
+								{
+									"key": "source_data_sub_type",
+									"value": "MasterCard",
+									"description": "Payment source sub-type"
+								},
+								{
+									"key": "hmac",
+									"value": "abc123hmacvalue",
+									"description": "HMAC signature for verification"
+								}
+							]
+						},
+						"description": "Browser redirect endpoint after payment on Paymob. Paymob redirects the user here with payment result as query parameters. Verifies HMAC, completes the order as a fallback if webhook hasn't arrived, then redirects to frontend success (/checkout/success?order_number=ORD-xxx) or failure (/checkout/failed?order_number=ORD-xxx) page. No authentication required."
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Payment Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order_number\": \"ORD-AB12CD34\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/payments/verify",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"payments",
+								"verify"
+							]
+						},
+						"description": "Manually verify payment status by querying Paymob API. Use when webhook/callback hasn't updated the order. If payment is confirmed at Paymob, completes the order (creates enrollments and instructor transactions). Only the authenticated order owner can verify their own orders. Returns order status and details."
 					},
 					"response": []
 				}

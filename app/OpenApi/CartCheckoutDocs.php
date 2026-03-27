@@ -118,8 +118,8 @@ class CartCheckoutDocs
 
     #[OA\Post(
         path: '/checkout',
-        summary: 'Process checkout',
-        description: 'Creates order, enrollments, and instructor transactions. Applies promo discount. Clears cart. All in a DB transaction.',
+        summary: 'Process checkout (Paymob)',
+        description: 'Creates a pending order from the cart, initiates a Paymob payment session, and returns a payment URL. The user should be redirected to the payment_url to complete payment. Enrollments are created only after successful payment (via webhook/callback). Clears cart items after order creation.',
         tags: ['Cart & Checkout'],
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(
@@ -134,11 +134,19 @@ class CartCheckoutDocs
             ]
         )),
         responses: [
-            new OA\Response(response: 201, description: 'Checkout completed', content: new OA\JsonContent(
-                properties: [new OA\Property(property: 'data', type: 'object', description: 'Order with items'), new OA\Property(property: 'message', type: 'string')]
+            new OA\Response(response: 201, description: 'Order created, redirect user to payment URL', content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'data', type: 'object', properties: [
+                        new OA\Property(property: 'order_number', type: 'string', example: 'ORD-AB12CD34'),
+                        new OA\Property(property: 'payment_url', type: 'string', example: 'https://accept.paymob.com/api/acceptance/iframes/...?payment_token=...'),
+                        new OA\Property(property: 'status', type: 'string', example: 'pending'),
+                    ]),
+                    new OA\Property(property: 'message', type: 'string', example: 'Proceed to payment.'),
+                ]
             )),
             new OA\Response(response: 401, description: 'Unauthenticated'),
             new OA\Response(response: 422, description: 'Cart empty or already enrolled'),
+            new OA\Response(response: 500, description: 'Checkout or Paymob integration failed'),
         ]
     )]
     public function checkout() {}

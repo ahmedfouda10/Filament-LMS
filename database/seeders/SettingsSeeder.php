@@ -11,6 +11,7 @@ class SettingsSeeder extends Seeder
     {
         $settings = [
             // General
+            ['key' => 'frontend_url', 'value' => 'https://spc.a2za1.com'],
             ['key' => 'site_name', 'value' => 'SPC Online Academy'],
             ['key' => 'logo', 'value' => '/images/logo-spc.png'],
             ['key' => 'site_description', 'value' => 'Empowering Medical Professionals with high-quality clinical courses'],
@@ -40,9 +41,16 @@ class SettingsSeeder extends Seeder
             ['key' => 'platform_fee_percentage', 'value' => '20'],
             ['key' => 'certificate_validity_years', 'value' => '2'],
 
+            // Active Payment Gateway
+            ['key' => 'active_payment_gateway', 'value' => 'paymob'],
+
             // Payment Gateway (Paymob)
             ['key' => 'paymob_api_key', 'value' => ''],
+            ['key' => 'paymob_secret_key', 'value' => ''],
+            ['key' => 'paymob_public_key', 'value' => ''],
+            ['key' => 'paymob_hmac_secret', 'value' => ''],
             ['key' => 'paymob_integration_id', 'value' => ''],
+            ['key' => 'paymob_wallet_integration_id', 'value' => ''],
             ['key' => 'paymob_iframe_id', 'value' => ''],
 
             // Maintenance

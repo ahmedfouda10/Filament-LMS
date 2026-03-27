@@ -54,7 +54,7 @@ class StudentOrderController extends Controller
                 ],
                 'items' => $order->items->map(function ($item) {
                     return [
-                        'course_title' => $item->course_title,
+                        'course_title' => $item->title,
                         'instructor_name' => $item->instructor_name,
                         'price' => $item->price,
                     ];

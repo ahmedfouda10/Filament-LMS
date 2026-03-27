@@ -730,8 +730,8 @@
                 "tags": [
                     "Cart & Checkout"
                 ],
-                "summary": "Process checkout",
-                "description": "Creates order, enrollments, and instructor transactions. Applies promo discount. Clears cart. All in a DB transaction.",
+                "summary": "Process checkout (Paymob)",
+                "description": "Creates a pending order from the cart, initiates a Paymob payment session, and returns a payment URL. The user should be redirected to the payment_url to complete payment. Enrollments are created only after successful payment (via webhook/callback). Clears cart items after order creation.",
                 "operationId": "108081c9ae4aa246661a15f8ddee50e2",
                 "requestBody": {
                     "required": true,
@@ -785,17 +785,31 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Checkout completed",
+                        "description": "Order created, redirect user to payment URL",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "description": "Order with items",
+                                            "properties": {
+                                                "order_number": {
+                                                    "type": "string",
+                                                    "example": "ORD-AB12CD34"
+                                                },
+                                                "payment_url": {
+                                                    "type": "string",
+                                                    "example": "https://accept.paymob.com/api/acceptance/iframes/...?payment_token=..."
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "pending"
+                                                }
+                                            },
                                             "type": "object"
                                         },
                                         "message": {
-                                            "type": "string"
+                                            "type": "string",
+                                            "example": "Proceed to payment."
                                         }
                                     },
                                     "type": "object"
@@ -808,6 +822,9 @@
                     },
                     "422": {
                         "description": "Cart empty or already enrolled"
+                    },
+                    "500": {
+                        "description": "Checkout or Paymob integration failed"
                     }
                 },
                 "security": [
@@ -5468,17 +5485,100 @@
                     "Webhooks"
                 ],
                 "summary": "Paymob payment webhook",
-                "description": "Receives payment status updates from Paymob gateway. Verified by HMAC signature. On success: updates order to completed and creates enrollments. On failure: updates order to failed.",
+                "description": "Server-to-server webhook called by Paymob after payment processing. Verifies HMAC signature from the payload. On success: updates order to completed, creates Enrollments and InstructorTransactions, increments promo code usage. On failure: marks order as failed. Logs all payment attempts to payment_logs table.",
                 "operationId": "3e42fb7d14db8c9b026463f399cab0a0",
+                "parameters": [
+                    {
+                        "name": "hmac",
+                        "in": "query",
+                        "description": "HMAC signature for payload verification",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "requestBody": {
-                    "description": "Paymob webhook payload",
+                    "description": "Paymob webhook payload with transaction object",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "example": "TRANSACTION"
+                                    },
                                     "obj": {
                                         "description": "Paymob transaction object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 12345
+                                            },
+                                            "pending": {
+                                                "type": "boolean",
+                                                "example": false
+                                            },
+                                            "amount_cents": {
+                                                "type": "integer",
+                                                "example": 262500
+                                            },
+                                            "success": {
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "is_auth": {
+                                                "type": "boolean",
+                                                "example": false
+                                            },
+                                            "is_capture": {
+                                                "type": "boolean",
+                                                "example": false
+                                            },
+                                            "is_standalone_payment": {
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "is_voided": {
+                                                "type": "boolean",
+                                                "example": false
+                                            },
+                                            "is_refunded": {
+                                                "type": "boolean",
+                                                "example": false
+                                            },
+                                            "is_3d_secure": {
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "order": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 67890
+                                                    },
+                                                    "merchant_order_id": {
+                                                        "type": "string",
+                                                        "example": "ORD-AB12CD34"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            },
+                                            "source_data": {
+                                                "properties": {
+                                                    "type": {
+                                                        "type": "string",
+                                                        "example": "card"
+                                                    },
+                                                    "sub_type": {
+                                                        "type": "string",
+                                                        "example": "MasterCard"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
                                         "type": "object"
                                     }
                                 },
@@ -5489,14 +5589,14 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Webhook processed",
+                        "description": "Webhook received and processed",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "message": {
+                                        "status": {
                                             "type": "string",
-                                            "example": "Webhook processed successfully."
+                                            "example": "received"
                                         }
                                     },
                                     "type": "object"
@@ -5504,10 +5604,228 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Invalid webhook signature"
+                    "403": {
+                        "description": "Invalid HMAC signature",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "invalid_hmac"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
+            }
+        },
+        "/payments/callback": {
+            "get": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Paymob browser redirect callback",
+                "description": "Browser redirect endpoint after payment on Paymob. Receives payment result as query parameters, verifies HMAC, and redirects the user to the frontend success or failure page. Also completes the order as a fallback if the webhook has not arrived yet. No authentication required.",
+                "operationId": "09b5cddb6f3e1f3bf83b620c68929ae0",
+                "parameters": [
+                    {
+                        "name": "success",
+                        "in": "query",
+                        "description": "Whether the payment was successful",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "true"
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "Paymob order ID",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "67890"
+                        }
+                    },
+                    {
+                        "name": "merchant_order_id",
+                        "in": "query",
+                        "description": "Application order number",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "ORD-AB12CD34"
+                        }
+                    },
+                    {
+                        "name": "amount_cents",
+                        "in": "query",
+                        "description": "Amount in cents",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 262500
+                        }
+                    },
+                    {
+                        "name": "hmac",
+                        "in": "query",
+                        "description": "HMAC signature for verification",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "Paymob transaction ID",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "currency",
+                        "in": "query",
+                        "description": "Currency code",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "EGP"
+                        }
+                    },
+                    {
+                        "name": "source_data_type",
+                        "in": "query",
+                        "description": "Payment source type",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "card"
+                        }
+                    },
+                    {
+                        "name": "source_data_sub_type",
+                        "in": "query",
+                        "description": "Payment source sub-type",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "MasterCard"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirects to frontend success page (/checkout/success?order_number=ORD-xxx) or failure page (/checkout/failed?order_number=ORD-xxx)"
+                    }
+                }
+            }
+        },
+        "/payments/verify": {
+            "post": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Manually verify payment status",
+                "description": "Queries Paymob API to verify payment status for a pending order. Use this when the webhook/callback has not updated the order status yet. If payment is confirmed, completes the order (creates enrollments and instructor transactions). Only the order owner can verify their own orders.",
+                "operationId": "f73f0a51bf5372dd3672a31ea66a5012",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "order_number"
+                                ],
+                                "properties": {
+                                    "order_number": {
+                                        "type": "string",
+                                        "example": "ORD-AB12CD34"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment verification result",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "order_number": {
+                                                    "type": "string",
+                                                    "example": "ORD-AB12CD34"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "completed",
+                                                    "enum": [
+                                                        "completed",
+                                                        "pending",
+                                                        "failed"
+                                                    ]
+                                                },
+                                                "already_completed": {
+                                                    "description": "Present when order was already completed before this request",
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "paid_amount": {
+                                                    "description": "Present when status is pending",
+                                                    "type": "number",
+                                                    "example": 2625
+                                                },
+                                                "expected_amount": {
+                                                    "description": "Present when status is pending",
+                                                    "type": "number",
+                                                    "example": 2625
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Payment verified and order completed."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Order not found"
+                    },
+                    "422": {
+                        "description": "No Paymob order ID found"
+                    },
+                    "500": {
+                        "description": "Payment verification failed"
+                    },
+                    "502": {
+                        "description": "Failed to inquire order from Paymob"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/user/preferences": {
@@ -8323,6 +8641,10 @@
         {
             "name": "Instructor - Bundles",
             "description": "Bundle course management"
+        },
+        {
+            "name": "Payments",
+            "description": "Payment callback and verification"
         },
         {
             "name": "Webhooks",
